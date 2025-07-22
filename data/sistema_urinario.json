@@ -59,11 +59,11 @@
         }
       },
       "codigos": {
-        "01-09-01": "Suprarrenalectomía unilateral",
-        "01-09-02": "Suprarrenalectomía bilateral",
-        "01-09-03": "Suprarrenalectomía laparoscópica",
-        "01-09-05": "Feocromocitoma",
-        "01-09-06": "Feocromocitoma Laparoscópico"
+  "01-09-01": { "nivel": "EE", "descripcion": "Suprarrenalectomía unilateral" },
+  "01-09-02": { "nivel": "EG", "descripcion": "Suprarrenalectomía bilateral" },
+  "01-09-03": { "nivel": "EH", "descripcion": "Suprarrenalectomía laparoscópica" },
+  "01-09-05": { "nivel": "EG", "descripcion": "Feocromocitoma" },
+  "01-09-06": { "nivel": "EI", "descripcion": "Feocromocitoma laparoscópico" }
       }
     }
   ]
