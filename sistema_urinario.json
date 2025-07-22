@@ -1,0 +1,92 @@
+{
+  "sistema": "urinario",
+  "modulos": [
+    {
+      "nombre": "glándula suprarrenal",
+      "inicio": "p1",
+      "preguntas": {
+        "p1": {
+          "texto": "¿Qué parte del cuerpo está involucrada en el procedimiento quirúrgico?",
+          "tipo": "opciones",
+          "opciones": {
+            "Sistema urinario": "p2",
+            "Sistema digestivo": "fin",
+            "Reproductivo": "fin",
+            "Otros": "fin"
+          }
+        },
+        "p2": {
+          "texto": "¿Cuál es el órgano específico del sistema urinario?",
+          "tipo": "opciones",
+          "opciones": {
+            "Glándula suprarrenal": "p3",
+            "Riñón": "fin",
+            "Vejiga": "fin",
+            "Uréter": "fin"
+          }
+        },
+        "p3": {
+          "texto": "¿Cuál es el diagnóstico o indicación quirúrgica principal?",
+          "tipo": "opciones",
+          "opciones": {
+            "Feocromocitoma": "p4",
+            "Otro": "p5"
+          }
+        },
+        "p4": {
+          "texto": "¿Cuál fue la vía de abordaje utilizada?",
+          "tipo": "opciones",
+          "opciones": {
+            "Abierta": "01-09-05",
+            "Laparoscópica": "01-09-06"
+          }
+        },
+        "p5": {
+          "texto": "¿Se extirpó una o ambas glándulas?",
+          "tipo": "opciones",
+          "opciones": {
+            "Una sola": "p6",
+            "Ambas": "01-09-02"
+          }
+        },
+        "p6": {
+          "texto": "¿Cuál fue la vía de abordaje utilizada?",
+          "tipo": "opciones",
+          "opciones": {
+            "Abierta": "01-09-01",
+            "Laparoscópica": "01-09-03"
+          }
+        }
+      },
+      "codigos": {
+        "01-09-01": "Suprarrenalectomía unilateral",
+        "01-09-02": "Suprarrenalectomía bilateral",
+        "01-09-03": "Suprarrenalectomía laparoscópica",
+        "01-09-05": "Feocromocitoma",
+        "01-09-06": "Feocromocitoma Laparoscópico"
+      }
+    }
+  ],
+  "codigos": {
+    "01-09-01": {
+      "nivel": "EE",
+      "descripcion": "Suprarrenalectomía unilateral"
+    },
+    "01-09-02": {
+      "nivel": "EG",
+      "descripcion": "Suprarrenalectomía bilateral"
+    },
+    "01-09-03": {
+      "nivel": "EH",
+      "descripcion": "Suprarrenalectomía laparoscópica"
+    },
+    "01-09-05": {
+      "nivel": "EG",
+      "descripcion": "Feocromocitoma"
+    },
+    "01-09-06": {
+      "nivel": "EI",
+      "descripcion": "Feocromocitoma Laparoscópico"
+    }
+  }
+}
