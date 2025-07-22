@@ -48,14 +48,21 @@ function iniciarConversacion(modulo) {
         }
     }
 
-    function mostrarCodigo(codigo) {
-        const desc = codigos[codigo] || "Código desconocido";
-        const div = document.createElement("div");
-        div.className = "chat-bubble";
-        div.innerHTML = `<strong>Código sugerido:</strong> ${codigo} – ${desc}`;
-        chatBox.appendChild(div);
-        controls.innerHTML = "";
+function mostrarCodigo(codigo) {
+    const obj = codigos[codigo];
+    let resultado;
+    if (typeof obj === "object" && obj !== null) {
+        resultado = `${codigo} (${obj.nivel}): ${obj.descripcion}`;
+    } else {
+        resultado = `${codigo}: ${obj || "Descripción no disponible"}`;
     }
+    const div = document.createElement("div");
+    div.className = "chat-bubble";
+    div.innerHTML = `<strong>Código sugerido:</strong> ${resultado}`;
+    chatBox.appendChild(div);
+    controls.innerHTML = "";
+}
+
 
     function mostrarFin() {
         const div = document.createElement("div");
