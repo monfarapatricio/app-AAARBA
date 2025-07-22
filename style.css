@@ -1,0 +1,22 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    padding: 20px;
+}
+#chat-container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+.chat-bubble {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 10px;
+    background: #e0e0e0;
+}
+button {
+    margin: 5px;
+}
