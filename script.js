@@ -1,1 +1,0 @@
-// script.js actualizado con soporte de API Key desde localStorage
