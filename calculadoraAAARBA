@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body {
+      background-color: #ffffff;
+      color: #303030;
+      font-family: Arial, sans-serif;
+      padding: 10px;
+    }
+    h2, h3 {
+      margin: 8px 0;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .row select {
+      flex: 1;
+      padding: 6px;
+      margin-right: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .row label {
+      margin-left: 5px;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    .btn, button {
+      background-color: #cf2e2e;
+      color: #ffffff;
+      border: none;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
+    }
+    .btn:hover, button:hover {
+      background-color: #b12828;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 12px;
+      border: 1px solid #abb8c3;
+      border-radius: 4px;
+    }
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #ffffff;
+      border-right: 3px solid #ffffff;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      margin-right: 6px;
+      animation: spin 1s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .button-row {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Calculadora Honorarios</h2>
+
+  <div class="section" id="sectionInicial">
+    <h3>Combinación Inicial</h3>
+    <div id="rowsInicial"></div>
+    <button class="btn" onclick="addRow('Inicial')">+ Agregar código</button>
+    <div><label><input type="checkbox" id="opInicial"> Incluir OP (30%)</label></div>
+  </div>
+
+  <div class="section" id="sectionPropuesto">
+    <h3>Combinación Propuesta</h3>
+    <div id="rowsPropuesto"></div>
+    <button class="btn" onclick="addRow('Propuesto')">+ Agregar código</button>
+    <div><label><input type="checkbox" id="opPropuesto"> Incluir OP (30%)</label></div>
+  </div>
+
+  <div class="button-row">
+    <button class="btn" id="calcBtn" onclick="calculate()">Calcular</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    var codigos = ["", "EP", "EO", "EN", "EM", "EL", "EK", "EJ", "EI", "EH", "EG", "EF", "EE", "ED", "EC", "EB", "EA", "MI", "MF", "ME", "MD", "MB", "OP"];
+
+    function addRow(sec) {
+      var cont = document.getElementById('rows' + sec);
+      var row = document.createElement('div');
+      row.className = 'row';
+
+      var sel = document.createElement('select');
+      codigos.forEach(function(c) {
+        var o = document.createElement('option');
+        o.value = c;
+        o.text = c;
+        sel.appendChild(o);
+      });
+
+      var chk50 = document.createElement('input');
+      chk50.type = 'checkbox';
+      chk50.title = '50%';
+
+      var lbl50 = document.createElement('label');
+      lbl50.textContent = '50%';
+      lbl50.insertBefore(chk50, lbl50.firstChild);
+
+      var btnRem = document.createElement('button');
+      btnRem.textContent = '✕';
+      btnRem.className = 'btn';
+      btnRem.style.marginLeft = '5px';
+      btnRem.onclick = function () {
+        cont.removeChild(row);
+      };
+
+      row.appendChild(sel);
+      row.appendChild(lbl50);
+      row.appendChild(btnRem);
+      cont.appendChild(row);
+    }
+
+    // Inicializar con 4 filas en cada sección
+    for (var i = 0; i < 4; i++) {
+      addRow('Inicial');
+      addRow('Propuesto');
+    }
+
+    function read(sec) {
+      var cont = document.getElementById('rows' + sec);
+      var opts = cont.querySelectorAll('select');
+      var checks = cont.querySelectorAll('input[type=checkbox]');
+      var codes = [], facs = [];
+      opts.forEach(function(s) {
+        if (s.value) codes.push(s.value);
+      });
+      checks.forEach(function(c, i) {
+        if (i < opts.length) facs.push(c.checked);
+      });
+      return { codes: codes, facs: facs };
+    }
+
+    function formatNumber(val) {
+      return val.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+    }
+
+    function calculate() {
+      var btn = document.getElementById('calcBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Calculando...';
+
+      var ini = read('Inicial'),
+          prop = read('Propuesto'),
+          opIni = document.getElementById('opInicial').checked,
+          opProp = document.getElementById('opPropuesto').checked;
+
+      google.script.run.withSuccessHandler(function(res) {
+        var out = '';
+        out += '<strong>Total inicial:</strong> $ ' + formatNumber(res.inicial.sum) + '<br>';
+        out += '<strong>OP inicial:</strong> $ ' + formatNumber(res.inicial.op) + '<br>';
+        out += '<strong>Total propuesto:</strong> $ ' + formatNumber(res.propuesto.sum) + '<br>';
+        out += '<strong>OP propuesto:</strong> $ ' + formatNumber(res.propuesto.op) + '<br>';
+        out += '<strong>Diferencia:</strong> $ ' + formatNumber(res.diferencia) + '<br><br>';
+        out += '<em>' + (res.propuesto.sum <= res.inicial.sum
+          ? 'Conviene generar débito'
+          : 'No conviene generar débito') + '</em>';
+        document.getElementById('result').innerHTML = out;
+
+        btn.disabled = false;
+        btn.innerHTML = 'Calcular';
+      }).calcular(ini.codes, ini.facs, opIni, prop.codes, prop.facs, opProp);
+    }
+  </script>
+</body>
+</html>
