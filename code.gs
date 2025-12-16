@@ -395,7 +395,7 @@ function generarDashboardDatos() {
     boleta: encabezados.indexOf("BOLETA")
   };
 
-  const parseMonto = (str) => parseFloat((str + "").replace(/\$/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+  const parseMonto = (const parseMonto = (valor) => limpiarValor(valor);
 
   const contarFrecuencias = (valores) => {
     const mapa = {};
@@ -424,7 +424,7 @@ function generarDashboardDatos() {
   const agruparConMonto = (rows, campo) => {
     const mapa = {};
     rows.forEach(r => {
-      const clave = r[campo];
+      const clave = (r[campo] || "").toString().trim();
       const monto = parseMonto(r[idx.procedimientoTotal]);
       if (!clave) return;
       if (!mapa[clave]) mapa[clave] = { cantidad: 0, monto: 0 };
