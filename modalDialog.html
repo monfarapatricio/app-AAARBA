@@ -14,13 +14,13 @@
     <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
 
     <style>
-      :root { --bg:#f5f5f5; --fg:#333; --brand:#4CAF50; }
-      body { font-family: Arial, sans-serif; margin:0; padding:12px; background-color: var(--bg); }
+      :root { --bg:#ffffff; --fg:#303030; --brand:#cf2e2e; }
+      body { font-family: Arial, sans-serif; margin:0; padding:12px; background-color: var(--bg); color: var(--fg); }
       h1 { text-align:center; font-size:18px; color:var(--fg); margin:0 0 8px; }
 
       .card { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.06); padding:12px; }
 
-      .loader { border:3px solid #f3f3f3; border-top:3px solid #3498db; width:24px; height:24px; border-radius:50%; animation: spin 1s linear infinite; display:none; }
+      .loader { border:3px solid #f3f3f3; border-top:3px solid var(--brand); width:24px; height:24px; border-radius:50%; animation: spin 1s linear infinite; display:none; }
       @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
 
       /* DataTables tweaks */
@@ -89,81 +89,82 @@
     </div>
 
     <script>
-      let dt = null;
+  let dt = null;
 
-      function loadAll() {
-        const loader = document.getElementById('loader');
-        const loadingText = document.getElementById('loading-text');
-        if (loader) loader.style.display = 'inline-block';
-        if (loadingText) loadingText.style.display = 'inline-block';
-        google.script.run.withSuccessHandler(displayResults).searchDatabase('');
-      }
+  function loadAll() {
+    const loader = document.getElementById('loader');
+    const loadingText = document.getElementById('loading-text');
+    if (loader) loader.style.display = 'inline-block';
+    if (loadingText) loadingText.style.display = 'inline-block';
+    google.script.run.withSuccessHandler(displayResults).searchDatabase('');
+  }
 
-      function displayResults(results) {
-        const loader = document.getElementById('loader');
-        const loadingText = document.getElementById('loading-text');
-        const loadingBox = document.getElementById('loading-box');
-        if (loader) loader.style.display = 'none';
-        // Ocultar la tarjeta superior de carga una vez finalizado
-        try {
-          const lc = document.getElementById('loader')?.closest('.card');
-          if (lc) lc.style.display = 'none';
-          const loadingText = document.getElementById('loading-text');
-          if (loadingText) loadingText.style.display = 'none';
-        } catch(e) { /* noop */ }
-        if (loadingText) loadingText.style.display = 'none';
-        if (loadingBox) loadingBox.style.display = 'none';
+  function displayResults(results) {
+    const loader = document.getElementById('loader');
+    const loadingText = document.getElementById('loading-text');
+    const loadingBox = document.getElementById('loading-box');
 
-        const table = document.getElementById('resultTable');
-        const theadRow = table.querySelector('thead tr');
-        const tbody = table.querySelector('tbody');
-        const noResults = document.getElementById('no-results');
+    // 🔹 Ocultar el loader apenas se cargan los resultados
+    if (loader) loader.style.display = 'none';
+    if (loadingText) loadingText.style.display = 'none';
+    if (loadingBox) loadingBox.style.display = 'none';
 
-        theadRow.innerHTML = '';
-        tbody.innerHTML = '';
+    const table = document.getElementById('resultTable');
+    const theadRow = table.querySelector('thead tr');
+    const tbody = table.querySelector('tbody');
+    const noResults = document.getElementById('no-results');
 
-        if (!results || results.length < 2) {
-          if (dt) { dt.destroy(); dt = null; }
-          noResults.style.display = 'block';
-          return;
-        }
-        noResults.style.display = 'none';
+    theadRow.innerHTML = '';
+    tbody.innerHTML = '';
 
-        [1,2,3].forEach(col => {
-          const th = document.createElement('th');
-          th.textContent = (results[0][col] ?? '').toString();
-          theadRow.appendChild(th);
-        });
+    if (!results || results.length < 2) {
+      if (dt) { dt.destroy(); dt = null; }
+      noResults.style.display = 'block';
+      return;
+    }
+    noResults.style.display = 'none';
 
-        for (let i = 1; i < results.length; i++) {
-          const tr = document.createElement('tr');
-          [1,2,3].forEach(col => {
-            const td = document.createElement('td');
-            td.textContent = (results[i][col] ?? '').toString();
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
-        }
+    // 🔹 Columnas: Código (B=1), Nivel (C=2), Descripción (D=3) y Órgano (A=0)
+    const cols = [1, 2, 3, 0];
+    const headers = ["Código", "Nivel", "Descripción", "Órgano"];
 
-        if (dt) { dt.destroy(); }
-        dt = new DataTable('#resultTable', {
-          paging: false,
-          info: false,
-          lengthChange: false,
-          searching: true,
-          ordering: true,
-          responsive: true,
-          language: {
-            search: "Buscar:",
-            zeroRecords: "No se encontraron registros coincidentes"
-          },
-          dom: 'ft',
-          scrollX: true,
-          autoWidth: false
-        });
-      }
+    // Crear encabezados
+    headers.forEach((title, index) => {
+      const th = document.createElement('th');
+      th.textContent = title;
+      theadRow.appendChild(th);
+    });
 
-      document.addEventListener('DOMContentLoaded', loadAll);
-    </script>
+    // Crear filas
+    for (let i = 1; i < results.length; i++) {
+      const tr = document.createElement('tr');
+      cols.forEach(col => {
+        const td = document.createElement('td');
+        td.textContent = (results[i][col] ?? '').toString();
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    }
+
+    if (dt) { dt.destroy(); }
+    dt = new DataTable('#resultTable', {
+      paging: false,
+      info: false,
+      lengthChange: false,
+      searching: true,
+      ordering: true,
+      responsive: true,
+      language: {
+        search: "Buscar:",
+        zeroRecords: "No se encontraron registros coincidentes"
+      },
+      dom: 'ft',
+      scrollX: true,
+      autoWidth: false
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', loadAll);
+</script>
   </body>
 </html>
