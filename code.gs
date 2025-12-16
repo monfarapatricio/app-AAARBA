@@ -395,7 +395,7 @@ function generarDashboardDatos() {
     boleta: encabezados.indexOf("BOLETA")
   };
 
-  const parseMonto = (const parseMonto = (valor) => limpiarValor(valor);
+  const parseMonto = (valor) => limpiarValor(valor);
 
   const contarFrecuencias = (valores) => {
     const mapa = {};
