@@ -116,10 +116,12 @@ function showSidebar() {
 function findAndHighlight(values, color) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = sheet.getDataRange().getValues();
-  var searchValues = values.split(' ').map(function(item) { return item.trim(); });
+  var searchValues = (values || '').split(/\s+/).map(function(item) { return item.trim(); }).filter(Boolean);
+  if (!searchValues.length) return "Sin valores para buscar";
+  var searchSet = new Set(searchValues);
   for (var i = 0; i < data.length; i++) {
     for (var j = 0; j < data[i].length; j++) {
-      if (searchValues.includes(data[i][j].toString())) {
+      if (searchSet.has(data[i][j].toString())) {
         sheet.getRange(i+1,1,1,data[i].length).setFontColor(color);
         break;
       }
@@ -132,10 +134,12 @@ function findAndHighlight(values, color) {
 function findAndHighlightRows(values, color) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = sheet.getDataRange().getValues();
-  var searchValues = values.split(' ').map(function(item) { return item.trim(); });
+  var searchValues = (values || '').split(/\s+/).map(function(item) { return item.trim(); }).filter(Boolean);
+  if (!searchValues.length) return "Sin valores para buscar";
+  var searchSet = new Set(searchValues);
   for (var i = 0; i < data.length; i++) {
     for (var j = 0; j < data[i].length; j++) {
-      if (searchValues.includes(data[i][j].toString())) {
+      if (searchSet.has(data[i][j].toString())) {
         sheet.getRange(i+1,1,1,data[i].length).setBackground(color);
         break;
       }
@@ -707,4 +711,3 @@ function ConDebito1() {
 function macroAbrirBuscador() {
   showBuscadorAAARBA();
 }
-
