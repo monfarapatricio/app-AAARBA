@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        padding: 20px;
+      }
+      .label {
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .input {
+        width: calc(100% - 22px);
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+      .color-picker {
+        display: flex;
+        justify-content: space-around;
+        margin: 10px 0;
+      }
+      .color-button {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+      }
+      .color-button.selected {
+        border-color: black;
+      }
+      .manual-color {
+        width: calc(100% - 22px);
+        height: 30px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin: 10px 0;
+      }
+      .action-button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      .action-button:hover {
+        background-color: #45a049;
+      }
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 20px;
+        height: 20px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+        display: none;
+      }
+      @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .status-message {
+        display: none;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <label class="label" for="value">Valores a buscar (separados por espacios):</label>
+      <input type="text" id="value" class="input" name="value">
+      <label class="label">Color:</label>
+      <div class="color-picker">
+        <button class="color-button" style="background-color: #ff0000;" onclick="selectColor('#ff0000')"></button>
+        <button class="color-button" style="background-color: #ffff00;" onclick="selectColor('#ffff00')"></button>
+        <button class="color-button" style="background-color: #0000ff;" onclick="selectColor('#0000ff')"></button>
+        <button class="color-button" style="background-color: #00ff00;" onclick="selectColor('#00ff00')"></button>
+        <button class="color-button" style="background-color: #ff9900;" onclick="selectColor('#ff9900')"></button>
+      </div>
+      <input type="color" id="manualColor" class="manual-color" onchange="selectManualColor()">
+      <input type="hidden" id="color" name="color">
+      <button class="action-button" onclick="findAndColor()">Buscar y Colorear Texto</button>
+      <button class="action-button" onclick="findAndColorRows()">Buscar y Colorear Filas</button>
+      <div class="loader" id="loader"></div>
+      <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <script>
+      function selectColor(color) {
+        document.getElementById('color').value = color;
+        highlightSelectedColor(color);
+      }
+
+      function selectManualColor() {
+        var color = document.getElementById('manualColor').value;
+        document.getElementById('color').value = color;
+        highlightSelectedColor(color);
+      }
+
+      function highlightSelectedColor(color) {
+        var buttons = document.querySelectorAll('.color-button');
+        buttons.forEach(function(button) {
+          if (button.style.backgroundColor === color) {
+            button.classList.add('selected');
+          } else {
+            button.classList.remove('selected');
+          }
+        });
+      }
+
+      function findAndColor() {
+        var value = document.getElementById('value').value;
+        var color = document.getElementById('color').value;
+        if (color === "") {
+          alert("Por favor, seleccione un color.");
+          return;
+        }
+        document.getElementById('loader').style.display = 'inline-block';
+        google.script.run.withSuccessHandler(onSuccess).findAndHighlight(value, color);
+      }
+
+      function findAndColorRows() {
+        var value = document.getElementById('value').value;
+        var color = document.getElementById('color').value;
+        if (color === "") {
+          alert("Por favor, seleccione un color.");
+          return;
+        }
+        document.getElementById('loader').style.display = 'inline-block';
+        google.script.run.withSuccessHandler(onSuccess).findAndHighlightRows(value, color);
+      }
+
+      function onSuccess(message) {
+        document.getElementById('loader').style.display = 'none';
+        var statusMessage = document.getElementById('statusMessage');
+        statusMessage.innerText = message;
+        statusMessage.style.display = 'block';
+      }
+    </script>
+  </body>
+</html>
