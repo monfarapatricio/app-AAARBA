@@ -141,15 +141,18 @@
 
     function read(sec) {
       var cont = document.getElementById('rows' + sec);
-      var opts = cont.querySelectorAll('select');
-      var checks = cont.querySelectorAll('input[type=checkbox]');
+      var rows = cont.querySelectorAll('.row');
       var codes = [], facs = [];
-      opts.forEach(function(s) {
-        if (s.value) codes.push(s.value);
+
+      rows.forEach(function(row) {
+        var sel = row.querySelector('select');
+        var chk = row.querySelector('input[type=checkbox]');
+        if (sel && sel.value) {
+          codes.push(sel.value);
+          facs.push(chk ? chk.checked : false);
+        }
       });
-      checks.forEach(function(c, i) {
-        if (i < opts.length) facs.push(c.checked);
-      });
+
       return { codes: codes, facs: facs };
     }
 
