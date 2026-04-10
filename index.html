@@ -130,6 +130,14 @@
         .btn-add { background: transparent; color: var(--brand-color); border: 2px dashed var(--brand-color); width: 100%; margin: 8px 0 14px; box-shadow: none; font-size: 13px; padding: 8px; }
         .btn-add:hover { background: rgba(207,46,46,0.05); box-shadow: none; transform: none; }
 
+        .sel-mult {
+            width: 62px; flex-shrink: 0; padding: 10px 6px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+            outline: none; background: #f8f9fa; color: var(--brand-color); cursor: pointer;
+            text-align: center; transition: all 0.2s;
+        }
+        .sel-mult:focus { border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(207,46,46,0.15); }
+
         .btn-remove { background: #fce8e8; color: var(--brand-color); padding: 8px; width: 34px; height: 34px; box-shadow: none; flex-shrink: 0; }
         .btn-remove:hover { background: #fad1d1; box-shadow: none; transform: none; }
 
@@ -526,13 +534,26 @@
         const row = document.createElement('div');
         row.className = 'row';
 
+        // Selector de nivel
         const sel = document.createElement('select');
+        sel.className = 'sel-nivel';
         codigos.forEach(function(c) {
           const o = document.createElement('option');
           o.value = c; o.text = c;
           sel.appendChild(o);
         });
 
+        // Selector de multiplicador
+        const selMult = document.createElement('select');
+        selMult.className = 'sel-mult';
+        selMult.title = 'Multiplicador';
+        [1, 2, 3, 4, 5].forEach(function(n) {
+          const o = document.createElement('option');
+          o.value = n; o.text = 'x' + n;
+          selMult.appendChild(o);
+        });
+
+        // Checkbox 50%
         const lbl = document.createElement('label');
         lbl.className = 'checkbox-label';
         const chk = document.createElement('input');
@@ -540,37 +561,43 @@
         lbl.appendChild(chk);
         lbl.appendChild(document.createTextNode(' 50%'));
 
+        // Botón eliminar
         const btnRem = document.createElement('button');
         btnRem.innerHTML = '&#10005;';
         btnRem.className = 'btn btn-remove';
         btnRem.onclick = () => cont.removeChild(row);
 
-        row.append(sel, lbl, btnRem);
+        row.append(sel, selMult, lbl, btnRem);
         cont.appendChild(row);
       }
 
       function read(sec) {
         const cont = document.getElementById('rows' + sec);
-        const codes = [], facs = [];
-        cont.querySelectorAll('select').forEach(function(s, i) {
+        const codes = [], facs = [], mults = [];
+        const selsNivel = cont.querySelectorAll('.sel-nivel');
+        const selsMult  = cont.querySelectorAll('.sel-mult');
+        const checks    = cont.querySelectorAll('input[type=checkbox]');
+        selsNivel.forEach(function(s, i) {
           if (s.value) {
             codes.push(s.value);
-            const chk = cont.querySelectorAll('input[type=checkbox]')[i];
-            facs.push(chk ? chk.checked : false);
+            facs.push(checks[i] ? checks[i].checked : false);
+            mults.push(selsMult[i] ? parseInt(selsMult[i].value) : 1);
           }
         });
-        return { codes, facs };
+        return { codes, facs, mults };
       }
 
       function formatNumber(val) {
         return Number(val || 0).toLocaleString('es-AR', { maximumFractionDigits: 0 });
       }
 
-      function computeTotal(codes, facs, includeOp) {
+      function computeTotal(codes, facs, includeOp, mults) {
         let subtotal = 0;
         codes.forEach(function(code, i) {
           if (code && tarifas[code] != null) {
-            subtotal += tarifas[code] * (facs[i] ? 0.5 : 1);
+            const factor = facs[i] ? 0.5 : 1;
+            const mult   = (mults && mults[i]) ? mults[i] : 1;
+            subtotal += tarifas[code] * factor * mult;
           }
         });
         const opValue = includeOp ? subtotal * 0.3 : 0;
@@ -595,8 +622,8 @@
           const ini = read('Inicial'), prop = read('Propuesto');
           const opIni = document.getElementById('opInicial').checked;
           const opProp = document.getElementById('opPropuesto').checked;
-          const inicial = computeTotal(ini.codes, ini.facs, opIni);
-          const propuesto = computeTotal(prop.codes, prop.facs, opProp);
+          const inicial = computeTotal(ini.codes, ini.facs, opIni, ini.mults);
+          const propuesto = computeTotal(prop.codes, prop.facs, opProp, prop.mults);
           const diferencia = inicial.sum - propuesto.sum;
           const esPositivo = propuesto.sum <= inicial.sum;
 
