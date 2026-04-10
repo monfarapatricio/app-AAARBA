@@ -125,30 +125,52 @@
         }
         .btn-ghost:hover { background: #f3f4f6; color: var(--text-main); border-color: #d1d5db; }
 
-        /* PANEL ARANCELES */
+        /* BOTÓN ARANCELES */
         .aranceles-wrapper { margin-bottom: 24px; }
         .btn-aranceles {
-            width: 100%; background: #f8f9fa; border: 1.5px solid var(--border-color); border-radius: 10px;
-            padding: 10px 16px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600;
-            font-size: 14px; color: var(--text-muted); text-align: left; transition: all 0.2s;
-            display: flex; align-items: center; gap: 8px;
+            background: #f8f9fa; border: 1.5px solid var(--border-color); border-radius: 10px;
+            padding: 9px 18px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600;
+            font-size: 14px; color: var(--text-muted); transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
         }
         .btn-aranceles:hover { background: #f0f1f3; color: var(--text-main); border-color: #d1d5db; }
-        .btn-aranceles .chevron { transition: transform 0.25s ease; font-style: normal; }
-        .btn-aranceles.open .chevron { transform: rotate(90deg); }
-        .aranceles-panel {
-            margin-top: 10px; border: 1px solid var(--border-color); border-radius: 10px;
-            overflow: hidden; animation: fadeIn 0.25s ease;
+
+        /* MODAL ARANCELES */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 1000;
+            align-items: center; justify-content: center;
+            animation: fadeIn 0.2s ease;
         }
-        .aranceles-panel table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .aranceles-panel th {
-            background: #f3f4f6; color: var(--text-main); font-weight: 600; padding: 10px 14px;
-            text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap;
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--bg-card); border-radius: 16px; width: 420px; max-width: 95vw;
+            max-height: 80vh; display: flex; flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: slideUp 0.25s ease;
         }
-        .aranceles-panel td { padding: 9px 14px; border-bottom: 1px solid var(--border-color); }
-        .aranceles-panel tbody tr:last-child td { border-bottom: none; }
-        .aranceles-panel tbody tr:nth-child(even) { background: #fafbfc; }
-        .aranceles-panel tbody tr:hover { background: #fce8e8; }
+        @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 24px 16px; border-bottom: 1px solid var(--border-color);
+        }
+        .modal-header h3 { margin: 0; font-size: 17px; font-weight: 700; }
+        .modal-close {
+            background: none; border: none; cursor: pointer; font-size: 20px;
+            color: var(--text-muted); line-height: 1; padding: 4px 8px; border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .modal-close:hover { background: #f3f4f6; color: var(--text-main); }
+        .modal-body { overflow-y: auto; padding: 0; }
+        .modal-body table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .modal-body th {
+            background: var(--brand-color); color: #fff; font-weight: 600;
+            padding: 10px 20px; text-align: left; position: sticky; top: 0;
+        }
+        .modal-body td { padding: 10px 20px; border-bottom: 1px solid var(--border-color); }
+        .modal-body tbody tr:last-child td { border-bottom: none; }
+        .modal-body tbody tr:nth-child(even) { background: #fafbfc; }
+        .modal-body tbody tr:hover { background: #fce8e8; }
         .nivel-badge {
             display: inline-block; background: var(--brand-color); color: #fff;
             border-radius: 6px; padding: 2px 10px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
@@ -246,22 +268,22 @@
         <hr class="section-divider">
 
         <div class="aranceles-wrapper">
-          <button class="btn-aranceles" id="btnAranceles" onclick="toggleAranceles()">
-            <em class="chevron">▶</em> Ver tabla de aranceles
-          </button>
-          <div class="aranceles-panel hidden" id="arancelesPanel">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nivel</th>
-                  <th>Arancel base</th>
-                  <th>Con factor 50%</th>
-                  <th>Con OP (30%)</th>
-                  <th>Con OP + 50%</th>
-                </tr>
-              </thead>
-              <tbody id="arancelesBody"></tbody>
-            </table>
+          <button class="btn-aranceles" onclick="abrirAranceles()">📋 Ver aranceles</button>
+        </div>
+
+        <!-- Modal aranceles -->
+        <div class="modal-overlay" id="modalAranceles" onclick="cerrarAranceles(event)">
+          <div class="modal">
+            <div class="modal-header">
+              <h3>Tabla de Aranceles</h3>
+              <button class="modal-close" onclick="cerrarAranceles()">✕</button>
+            </div>
+            <div class="modal-body">
+              <table>
+                <thead><tr><th>Nivel</th><th>Arancel base</th></tr></thead>
+                <tbody id="arancelesBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -429,16 +451,17 @@
         resDiv.innerHTML = '';
       }
 
-      function toggleAranceles() {
-        const panel = document.getElementById('arancelesPanel');
-        const btn = document.getElementById('btnAranceles');
-        const abriendo = panel.classList.contains('hidden');
-        panel.classList.toggle('hidden');
-        btn.classList.toggle('open');
-        btn.querySelector('.chevron').textContent = abriendo ? '▶' : '▶';
-        btn.childNodes[1].textContent = abriendo ? ' Ocultar tabla de aranceles' : ' Ver tabla de aranceles';
-        if (abriendo && document.getElementById('arancelesBody').children.length === 0) {
+      function abrirAranceles() {
+        if (document.getElementById('arancelesBody').children.length === 0) {
           renderAranceles();
+        }
+        document.getElementById('modalAranceles').classList.add('open');
+      }
+
+      function cerrarAranceles(e) {
+        // Cierra si se hizo click en el overlay (fondo) o en el botón X
+        if (!e || e.target === document.getElementById('modalAranceles')) {
+          document.getElementById('modalAranceles').classList.remove('open');
         }
       }
 
@@ -447,16 +470,9 @@
         const orden = ["EV","EP","EO","EN","EM","EL","EK","EJ","EI","EH","EG","EF","EE","ED","EC","EB","EA","MI","MF","ME","MD","MB","OP","UF","UO","US","UD"];
         const codOrdenados = orden.filter(c => tarifas[c] != null);
         body.innerHTML = codOrdenados.map(function(cod) {
-          const base   = tarifas[cod];
-          const fac50  = base * 0.5;
-          const conOP  = base * 1.3;
-          const op50   = fac50 * 1.3;
           return '<tr>' +
             '<td><span class="nivel-badge">' + cod + '</span></td>' +
-            '<td class="monto">$ ' + formatNumber(base)  + '</td>' +
-            '<td class="monto">$ ' + formatNumber(fac50) + '</td>' +
-            '<td class="monto">$ ' + formatNumber(conOP) + '</td>' +
-            '<td class="monto">$ ' + formatNumber(op50)  + '</td>' +
+            '<td class="monto">$ ' + formatNumber(tarifas[cod]) + '</td>' +
             '</tr>';
         }).join('');
       }
