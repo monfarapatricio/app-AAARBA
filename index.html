@@ -216,10 +216,9 @@
     </div>
 
     <script>
-      // URL de tu API (Apps Script publicado como Web App)
-      const API_URL = 'https://script.google.com/macros/s/AKfycby4iqsMSHwyID_JQ946FodSmou2oiC5K5vDakdMkf2k93mYrOYVFm7E1uSIjKnb_9v3/exec';
-
+      // Datos cargados desde archivos JSON estáticos en el mismo repositorio
       let allRows = [];
+      let tarifas = {};
       const codigos = ["", "EP", "EO", "EN", "EM", "EL", "EK", "EJ", "EI", "EH", "EG", "EF", "EE", "ED", "EC", "EB", "EA", "MI", "MF", "ME", "MD", "MB", "UD", "UN", "UO", "US", "UF"];
 
       function showTab(tab) {
@@ -230,23 +229,12 @@
         buttons[1].classList.toggle('active', tab === 'calculadora');
       }
 
-      // Llama a la API de Apps Script. Devuelve una promesa con los datos.
-      async function apiCall(params) {
-        const url = API_URL + '?' + new URLSearchParams(params).toString();
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Error de red: ' + res.status);
-        const json = await res.json();
-        if (!json.ok) throw new Error(json.error || 'Error desconocido');
-        return json.data;
-      }
-
       async function loadNomenclador() {
         document.getElementById('nomLoader').style.display = 'block';
         try {
-          const results = await apiCall({ action: 'search', q: '' });
-          allRows = (results || []).slice(1).map(function(r) {
-            return { codigo: r[1] || '', nivel: r[2] || '', descripcion: r[3] || '', organo: r[0] || '' };
-          });
+          const res = await fetch('nomenclador.json');
+          if (!res.ok) throw new Error('No se pudo cargar nomenclador.json (' + res.status + ')');
+          allRows = await res.json();
           renderNomenclador();
         } catch (err) {
           console.error(err);
@@ -254,6 +242,17 @@
             '<tr><td colspan="4" style="text-align:center; padding:20px; color:#c5221f;">Error al cargar datos: ' + err.message + '</td></tr>';
         } finally {
           document.getElementById('nomLoader').style.display = 'none';
+        }
+      }
+
+      async function loadTarifas() {
+        try {
+          const res = await fetch('tarifas.json');
+          if (!res.ok) throw new Error('No se pudo cargar tarifas.json (' + res.status + ')');
+          tarifas = await res.json();
+        } catch (err) {
+          console.error(err);
+          alert('Error al cargar tarifas: ' + err.message);
         }
       }
 
@@ -352,6 +351,22 @@
         return Number(val || 0).toLocaleString('es-AR', { maximumFractionDigits: 0 });
       }
 
+      function computeTotal(codes, facs, includeOp) {
+        let subtotal = 0;
+        codes.forEach(function(code, i) {
+          if (code && tarifas[code] != null) {
+            const factor = facs[i] ? 0.5 : 1;
+            subtotal += tarifas[code] * factor;
+          }
+        });
+        let opValue = 0;
+        if (includeOp) {
+          opValue = subtotal * 0.3;
+          subtotal += opValue;
+        }
+        return { sum: subtotal, op: opValue };
+      }
+
       async function calculate() {
         const btn = document.getElementById('calcBtn');
         btn.disabled = true;
@@ -363,15 +378,9 @@
           const opIni = document.getElementById('opInicial').checked;
           const opProp = document.getElementById('opPropuesto').checked;
 
-          const res = await apiCall({
-            action: 'calcular',
-            codesInit: JSON.stringify(ini.codes),
-            facInit:   JSON.stringify(ini.facs),
-            opInit:    opIni ? 'true' : 'false',
-            codesProp: JSON.stringify(prop.codes),
-            facProp:   JSON.stringify(prop.facs),
-            opProp:    opProp ? 'true' : 'false'
-          });
+          const inicial = computeTotal(ini.codes, ini.facs, opIni);
+          const propuesto = computeTotal(prop.codes, prop.facs, opProp);
+          const res = { inicial: inicial, propuesto: propuesto, diferencia: inicial.sum - propuesto.sum };
 
           let out = '';
           out += '<strong>Total Inicial:</strong> $ ' + formatNumber(res.inicial.sum) + (res.inicial.op > 0 ? ' <small>(Inc. OP: $' + formatNumber(res.inicial.op) + ')</small>' : '') + '<br>';
@@ -402,6 +411,7 @@
           addRow('Propuesto');
         }
         loadNomenclador();
+        loadTarifas();
       });
     </script>
 </body>
