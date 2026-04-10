@@ -112,6 +112,49 @@
         .calc-btn-container { display: flex; justify-content: center; margin: 30px 0 10px 0; }
         #calcBtn { font-size: 16px; padding: 14px 40px; border-radius: 30px; width: 100%; }
 
+        /* CABECERA CALCULADORA */
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; }
+        .section-header .section-title { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .section-divider { border: none; border-top: 2px solid var(--border-color); margin: 12px 0 20px 0; }
+
+        /* BOTÓN LIMPIAR */
+        .btn-ghost {
+            background: transparent; color: var(--text-muted); border: 1.5px solid var(--border-color);
+            border-radius: 8px; padding: 8px 16px; cursor: pointer; font-family: 'Inter', sans-serif;
+            font-weight: 600; font-size: 13px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-ghost:hover { background: #f3f4f6; color: var(--text-main); border-color: #d1d5db; }
+
+        /* PANEL ARANCELES */
+        .aranceles-wrapper { margin-bottom: 24px; }
+        .btn-aranceles {
+            width: 100%; background: #f8f9fa; border: 1.5px solid var(--border-color); border-radius: 10px;
+            padding: 10px 16px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600;
+            font-size: 14px; color: var(--text-muted); text-align: left; transition: all 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-aranceles:hover { background: #f0f1f3; color: var(--text-main); border-color: #d1d5db; }
+        .btn-aranceles .chevron { transition: transform 0.25s ease; font-style: normal; }
+        .btn-aranceles.open .chevron { transform: rotate(90deg); }
+        .aranceles-panel {
+            margin-top: 10px; border: 1px solid var(--border-color); border-radius: 10px;
+            overflow: hidden; animation: fadeIn 0.25s ease;
+        }
+        .aranceles-panel table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .aranceles-panel th {
+            background: #f3f4f6; color: var(--text-main); font-weight: 600; padding: 10px 14px;
+            text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap;
+        }
+        .aranceles-panel td { padding: 9px 14px; border-bottom: 1px solid var(--border-color); }
+        .aranceles-panel tbody tr:last-child td { border-bottom: none; }
+        .aranceles-panel tbody tr:nth-child(even) { background: #fafbfc; }
+        .aranceles-panel tbody tr:hover { background: #fce8e8; }
+        .nivel-badge {
+            display: inline-block; background: var(--brand-color); color: #fff;
+            border-radius: 6px; padding: 2px 10px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
+        }
+        .monto { font-variant-numeric: tabular-nums; }
+
         /* RESULT */
         .result {
             padding: 20px; background-color: var(--bg-card); border-radius: 12px;
@@ -196,7 +239,31 @@
       </section>
 
       <section id="tab-calculadora" class="card hidden">
-        <h3 class="section-title">Calculadora de Honorarios</h3>
+        <div class="section-header">
+          <h3 class="section-title">Calculadora de Honorarios</h3>
+          <button class="btn-ghost" onclick="limpiarCalculadora()">↺ Limpiar</button>
+        </div>
+        <hr class="section-divider">
+
+        <div class="aranceles-wrapper">
+          <button class="btn-aranceles" id="btnAranceles" onclick="toggleAranceles()">
+            <em class="chevron">▶</em> Ver tabla de aranceles
+          </button>
+          <div class="aranceles-panel hidden" id="arancelesPanel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nivel</th>
+                  <th>Arancel base</th>
+                  <th>Con factor 50%</th>
+                  <th>Con OP (30%)</th>
+                  <th>Con OP + 50%</th>
+                </tr>
+              </thead>
+              <tbody id="arancelesBody"></tbody>
+            </table>
+          </div>
+        </div>
 
         <h4>Combinación Inicial</h4>
         <div id="rowsInicial"></div>
@@ -349,6 +416,49 @@
 
       function formatNumber(val) {
         return Number(val || 0).toLocaleString('es-AR', { maximumFractionDigits: 0 });
+      }
+
+      function limpiarCalculadora() {
+        ['Inicial', 'Propuesto'].forEach(function(sec) {
+          document.getElementById('rows' + sec).innerHTML = '';
+          for (var i = 0; i < 4; i++) addRow(sec);
+          document.getElementById('op' + sec).checked = false;
+        });
+        const resDiv = document.getElementById('result');
+        resDiv.style.display = 'none';
+        resDiv.innerHTML = '';
+      }
+
+      function toggleAranceles() {
+        const panel = document.getElementById('arancelesPanel');
+        const btn = document.getElementById('btnAranceles');
+        const abriendo = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        btn.classList.toggle('open');
+        btn.querySelector('.chevron').textContent = abriendo ? '▶' : '▶';
+        btn.childNodes[1].textContent = abriendo ? ' Ocultar tabla de aranceles' : ' Ver tabla de aranceles';
+        if (abriendo && document.getElementById('arancelesBody').children.length === 0) {
+          renderAranceles();
+        }
+      }
+
+      function renderAranceles() {
+        const body = document.getElementById('arancelesBody');
+        const orden = ["EV","EP","EO","EN","EM","EL","EK","EJ","EI","EH","EG","EF","EE","ED","EC","EB","EA","MI","MF","ME","MD","MB","OP","UF","UO","US","UD"];
+        const codOrdenados = orden.filter(c => tarifas[c] != null);
+        body.innerHTML = codOrdenados.map(function(cod) {
+          const base   = tarifas[cod];
+          const fac50  = base * 0.5;
+          const conOP  = base * 1.3;
+          const op50   = fac50 * 1.3;
+          return '<tr>' +
+            '<td><span class="nivel-badge">' + cod + '</span></td>' +
+            '<td class="monto">$ ' + formatNumber(base)  + '</td>' +
+            '<td class="monto">$ ' + formatNumber(fac50) + '</td>' +
+            '<td class="monto">$ ' + formatNumber(conOP) + '</td>' +
+            '<td class="monto">$ ' + formatNumber(op50)  + '</td>' +
+            '</tr>';
+        }).join('');
       }
 
       function computeTotal(codes, facs, includeOp) {
