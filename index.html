@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>AAARBA Web App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-color: #cf2e2e;
+            --brand-hover: #b12828;
+            --bg-body: #f4f6f8;
+            --bg-card: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            color: var(--text-main);
+            background: var(--bg-body);
+            padding: 16px;
+        }
+
+        .app { max-width: 980px; margin: 0 auto; }
+
+        h1 { margin: 0 0 24px; font-size: 26px; text-align: center; font-weight: 700; color: var(--text-main); }
+        h3.section-title { font-size: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin: 0 0 20px 0; }
+        h4 { margin: 20px 0 12px; font-size: 16px; font-weight: 600; color: var(--text-main); }
+
+        /* TABS */
+        .tabs { display: flex; gap: 12px; margin-bottom: 24px; }
+        .tab-btn {
+            flex: 1; border: 1px solid var(--border-color); background: var(--bg-card);
+            padding: 14px; border-radius: 12px; cursor: pointer; font-family: 'Inter', sans-serif;
+            font-weight: 600; font-size: 15px; color: var(--text-muted);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px -2px rgba(0,0,0,0.05);
+        }
+        .tab-btn:hover { background: #fdfdfd; color: var(--text-main); border-color: #d1d5db; }
+        .tab-btn.active {
+            background: var(--brand-color); color: #fff; border-color: var(--brand-color);
+            box-shadow: 0 4px 6px -1px rgba(207, 46, 46, 0.2);
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card); border-radius: 12px; padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            animation: fadeIn 0.3s ease;
+        }
+        .hidden { display: none; }
+
+        /* NOMENCLADOR */
+        .search-container { position: relative; margin-bottom: 20px; }
+        .search-container input {
+            width: 100%; border-radius: 30px; border: 1px solid var(--border-color);
+            padding: 14px 20px; font-size: 15px; font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body); outline: none; transition: all 0.2s ease-in-out;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); color: var(--text-main);
+        }
+        .search-container input:focus {
+            border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(207, 46, 46, 0.15);
+            background-color: var(--bg-card);
+        }
+
+        .table-wrap { max-height: 520px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { border-bottom: 1px solid var(--border-color); padding: 12px 14px; text-align: left; }
+        th { background: var(--brand-color); color: #fff; font-weight: 600; position: sticky; top: 0; z-index: 10; white-space: nowrap; }
+        tbody tr { transition: background-color 0.2s; }
+        tbody tr:nth-child(even) { background-color: #fafbfc; }
+        tbody tr:hover { background-color: #fce8e8; }
+
+        /* CALCULATOR ROWS */
+        .row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; animation: fadeIn 0.3s; }
+        .row select {
+            flex: 1; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px;
+            font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: all 0.2s;
+            background: #fff; appearance: auto; color: var(--text-main);
+        }
+        .row select:focus { border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(207, 46, 46, 0.15); }
+
+        .checkbox-label {
+            display: flex; align-items: center; font-size: 14px; font-weight: 500;
+            color: var(--text-muted); cursor: pointer; user-select: none;
+        }
+        .checkbox-label input[type="checkbox"] { margin-right: 8px; width: 16px; height: 16px; accent-color: var(--brand-color); cursor: pointer; }
+
+        /* BUTTONS */
+        .btn {
+            border: none; background: var(--brand-color); color: #fff; border-radius: 8px;
+            padding: 10px 18px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
+            box-shadow: 0 2px 4px rgba(207, 46, 46, 0.2); transition: all 0.2s;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn:hover { background: var(--brand-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(207, 46, 46, 0.25); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-add { background: transparent; color: var(--brand-color); border: 2px dashed var(--brand-color); width: 100%; margin: 10px 0 16px; box-shadow: none; }
+        .btn-add:hover { background: rgba(207, 46, 46, 0.05); color: var(--brand-hover); border-color: var(--brand-hover); box-shadow: none; }
+
+        .btn-remove { background: #fce8e8; color: var(--brand-color); padding: 8px; width: 38px; box-shadow: none; }
+        .btn-remove:hover { background: #fad1d1; color: var(--brand-hover); box-shadow: none; }
+
+        .calc-btn-container { display: flex; justify-content: center; margin: 30px 0 10px 0; }
+        #calcBtn { font-size: 16px; padding: 14px 40px; border-radius: 30px; width: 100%; }
+
+        /* RESULT */
+        .result {
+            padding: 20px; background-color: var(--bg-card); border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border-left: 5px solid var(--brand-color);
+            line-height: 1.8; font-size: 15px; display: none; animation: fadeIn 0.4s; color: var(--text-main);
+            margin-top: 20px;
+        }
+        .result .diff { font-size: 18px; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px; font-weight: 700; }
+        .conclusion {
+            display: inline-block; padding: 6px 14px; border-radius: 8px; font-weight: 600;
+            font-size: 15px; background-color: #f3f4f6; margin-top: 14px; width: 100%;
+            box-sizing: border-box; text-align: center;
+        }
+        .conclusion.positive { background-color: #e6f4ea; color: #137333; }
+        .conclusion.negative { background-color: #fce8e8; color: #c5221f; }
+
+        .loader {
+            border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--brand-color);
+            width: 24px; height: 24px; border-radius: 50%; animation: spin 1s linear infinite;
+            display: none; margin: 20px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0) } 100% { transform: rotate(360deg) } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--text-main);
+            color: #fff;
+            text-align: center;
+            border-radius: 30px;
+            padding: 12px 20px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast">¡Copiado con éxito!</div>
+    <div class="app">
+      <h1>AAARBA Web App</h1>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('nomenclador')">Nomenclador AAARBA</button>
+        <button class="tab-btn" onclick="showTab('calculadora')">Calculadora AAARBA</button>
+      </div>
+
+      <section id="tab-nomenclador" class="card">
+        <h3 class="section-title">Buscador de Nomenclador</h3>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Buscar por código, nivel, descripción u órgano..." oninput="renderNomenclador()" />
+        </div>
+        <div class="loader" id="nomLoader"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nivel</th>
+                <th>Descripción</th>
+                <th>Órgano</th>
+              </tr>
+            </thead>
+            <tbody id="nomBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="tab-calculadora" class="card hidden">
+        <h3 class="section-title">Calculadora de Honorarios</h3>
+
+        <h4>Combinación Inicial</h4>
+        <div id="rowsInicial"></div>
+        <button class="btn btn-add" onclick="addRow('Inicial')">+ Agregar código</button>
+        <label class="checkbox-label"><input type="checkbox" id="opInicial"> Incluir Modificador OP (30%)</label>
+
+        <h4>Combinación Propuesta</h4>
+        <div id="rowsPropuesto"></div>
+        <button class="btn btn-add" onclick="addRow('Propuesto')">+ Agregar código</button>
+        <label class="checkbox-label"><input type="checkbox" id="opPropuesto"> Incluir Modificador OP (30%)</label>
+
+        <div class="calc-btn-container">
+          <button class="btn" id="calcBtn" onclick="calculate()">Calcular</button>
+        </div>
+        <div class="result" id="result"></div>
+      </section>
+    </div>
+
+    <script>
+      // URL de tu API (Apps Script publicado como Web App)
+      const API_URL = 'https://script.google.com/macros/s/AKfycby4iqsMSHwyID_JQ946FodSmou2oiC5K5vDakdMkf2k93mYrOYVFm7E1uSIjKnb_9v3/exec';
+
+      let allRows = [];
+      const codigos = ["", "EP", "EO", "EN", "EM", "EL", "EK", "EJ", "EI", "EH", "EG", "EF", "EE", "ED", "EC", "EB", "EA", "MI", "MF", "ME", "MD", "MB", "UD", "UN", "UO", "US", "UF"];
+
+      function showTab(tab) {
+        document.getElementById('tab-nomenclador').classList.toggle('hidden', tab !== 'nomenclador');
+        document.getElementById('tab-calculadora').classList.toggle('hidden', tab !== 'calculadora');
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons[0].classList.toggle('active', tab === 'nomenclador');
+        buttons[1].classList.toggle('active', tab === 'calculadora');
+      }
+
+      // Llama a la API de Apps Script. Devuelve una promesa con los datos.
+      async function apiCall(params) {
+        const url = API_URL + '?' + new URLSearchParams(params).toString();
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Error de red: ' + res.status);
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.error || 'Error desconocido');
+        return json.data;
+      }
+
+      async function loadNomenclador() {
+        document.getElementById('nomLoader').style.display = 'block';
+        try {
+          const results = await apiCall({ action: 'search', q: '' });
+          allRows = (results || []).slice(1).map(function(r) {
+            return { codigo: r[1] || '', nivel: r[2] || '', descripcion: r[3] || '', organo: r[0] || '' };
+          });
+          renderNomenclador();
+        } catch (err) {
+          console.error(err);
+          document.getElementById('nomBody').innerHTML =
+            '<tr><td colspan="4" style="text-align:center; padding:20px; color:#c5221f;">Error al cargar datos: ' + err.message + '</td></tr>';
+        } finally {
+          document.getElementById('nomLoader').style.display = 'none';
+        }
+      }
+
+      function renderNomenclador() {
+        const term = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+        const body = document.getElementById('nomBody');
+        body.innerHTML = '';
+
+        const filtered = !term ? allRows : allRows.filter(function(r) {
+          return [r.codigo, r.nivel, r.descripcion, r.organo].join(' ').toLowerCase().includes(term);
+        });
+
+        if (filtered.length === 0 && allRows.length > 0) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = '<td colspan="4" style="text-align:center; padding:20px; color:#6b7280;">No se encontraron resultados.</td>';
+          body.appendChild(tr);
+        } else {
+          filtered.forEach(function(r) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + r.codigo + '</td><td>' + r.nivel + '</td><td>' + r.descripcion + '</td><td>' + r.organo + '</td>';
+            tr.style.cursor = 'pointer';
+            tr.title = 'Hacer clic para copiar fila';
+
+            tr.onclick = function() {
+              const texto = r.codigo + ' - ' + r.nivel + ' - ' + r.descripcion;
+              navigator.clipboard.writeText(texto).then(function() {
+                mostrarToast('¡Copiado: ' + r.codigo + '!');
+              }).catch(function(err) {
+                console.error('Error al copiar: ', err);
+              });
+            };
+
+            body.appendChild(tr);
+          });
+        }
+      }
+
+      function mostrarToast(mensaje) {
+        const toast = document.getElementById('toast');
+        toast.textContent = mensaje;
+        toast.classList.add('show');
+        setTimeout(function() {
+          toast.classList.remove('show');
+        }, 2500);
+      }
+
+      function addRow(sec) {
+        const cont = document.getElementById('rows' + sec);
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        const sel = document.createElement('select');
+        codigos.forEach(function(c) {
+          const o = document.createElement('option');
+          o.value = c;
+          o.text = c;
+          sel.appendChild(o);
+        });
+
+        const lbl50 = document.createElement('label');
+        lbl50.className = 'checkbox-label';
+        lbl50.textContent = ' 50%';
+        const chk50 = document.createElement('input');
+        chk50.type = 'checkbox';
+        lbl50.prepend(chk50);
+
+        const btnRem = document.createElement('button');
+        btnRem.innerHTML = '&#10005;';
+        btnRem.className = 'btn btn-remove';
+        btnRem.onclick = function () { cont.removeChild(row); };
+
+        row.appendChild(sel);
+        row.appendChild(lbl50);
+        row.appendChild(btnRem);
+        cont.appendChild(row);
+      }
+
+      function read(sec) {
+        const cont = document.getElementById('rows' + sec);
+        const opts = cont.querySelectorAll('select');
+        const checks = cont.querySelectorAll('input[type=checkbox]');
+        const codes = [], facs = [];
+
+        opts.forEach(function(s) {
+          if (s.value) {
+            codes.push(s.value);
+          }
+        });
+        checks.forEach(function(c, i) {
+          if (i < opts.length) facs.push(c.checked);
+        });
+        return { codes: codes, facs: facs };
+      }
+
+      function formatNumber(val) {
+        return Number(val || 0).toLocaleString('es-AR', { maximumFractionDigits: 0 });
+      }
+
+      async function calculate() {
+        const btn = document.getElementById('calcBtn');
+        btn.disabled = true;
+        btn.textContent = 'Calculando...';
+
+        try {
+          const ini = read('Inicial');
+          const prop = read('Propuesto');
+          const opIni = document.getElementById('opInicial').checked;
+          const opProp = document.getElementById('opPropuesto').checked;
+
+          const res = await apiCall({
+            action: 'calcular',
+            codesInit: JSON.stringify(ini.codes),
+            facInit:   JSON.stringify(ini.facs),
+            opInit:    opIni ? 'true' : 'false',
+            codesProp: JSON.stringify(prop.codes),
+            facProp:   JSON.stringify(prop.facs),
+            opProp:    opProp ? 'true' : 'false'
+          });
+
+          let out = '';
+          out += '<strong>Total Inicial:</strong> $ ' + formatNumber(res.inicial.sum) + (res.inicial.op > 0 ? ' <small>(Inc. OP: $' + formatNumber(res.inicial.op) + ')</small>' : '') + '<br>';
+          out += '<strong>Total Propuesto:</strong> $ ' + formatNumber(res.propuesto.sum) + (res.propuesto.op > 0 ? ' <small>(Inc. OP: $' + formatNumber(res.propuesto.op) + ')</small>' : '') + '<br>';
+
+          const esPositivo = res.propuesto.sum <= res.inicial.sum;
+          const difClass = esPositivo ? 'positive' : 'negative';
+          const conclusionTxt = esPositivo ? '✓ Conviene generar débito' : '✕ No conviene generar débito';
+
+          out += '<div class="diff">Diferencia: $ ' + formatNumber(res.diferencia) + '</div>';
+          out += '<div class="conclusion ' + difClass + '">' + conclusionTxt + '</div>';
+
+          const resDiv = document.getElementById('result');
+          resDiv.style.display = 'block';
+          resDiv.innerHTML = out;
+        } catch (err) {
+          console.error(err);
+          alert('Error al calcular: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Calcular';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        for (let i = 0; i < 4; i++) {
+          addRow('Inicial');
+          addRow('Propuesto');
+        }
+        loadNomenclador();
+      });
+    </script>
+</body>
+</html>
