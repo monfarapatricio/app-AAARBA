@@ -4,7 +4,8 @@
     <meta charset="utf-8" />
     <title>AAARBA Web App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- 8. Favicon con iniciales AA -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23cf2e2e'/><text font-size='52' font-family='Arial,sans-serif' font-weight='900' fill='white' x='50' y='68' text-anchor='middle'>AA</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,6 +16,10 @@
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --border-color: #e5e7eb;
+            --green: #137333;
+            --green-bg: #e6f4ea;
+            --red: #c5221f;
+            --red-bg: #fce8e8;
         }
 
         * { box-sizing: border-box; }
@@ -29,36 +34,34 @@
 
         .app { max-width: 980px; margin: 0 auto; }
 
-        h1 { margin: 0 0 24px; font-size: 26px; text-align: center; font-weight: 700; color: var(--text-main); }
+        h1 { margin: 0 0 24px; font-size: 26px; text-align: center; font-weight: 700; }
         h3.section-title { font-size: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin: 0 0 20px 0; }
-        h4 { margin: 20px 0 12px; font-size: 16px; font-weight: 600; color: var(--text-main); }
+        h4 { margin: 20px 0 12px; font-size: 16px; font-weight: 600; }
 
         /* TABS */
         .tabs { display: flex; gap: 12px; margin-bottom: 24px; }
         .tab-btn {
             flex: 1; border: 1px solid var(--border-color); background: var(--bg-card);
             padding: 14px; border-radius: 12px; cursor: pointer; font-family: 'Inter', sans-serif;
-            font-weight: 600; font-size: 15px; color: var(--text-muted);
-            transition: all 0.2s ease;
+            font-weight: 600; font-size: 15px; color: var(--text-muted); transition: all 0.2s ease;
             box-shadow: 0 2px 4px -2px rgba(0,0,0,0.05);
         }
         .tab-btn:hover { background: #fdfdfd; color: var(--text-main); border-color: #d1d5db; }
         .tab-btn.active {
             background: var(--brand-color); color: #fff; border-color: var(--brand-color);
-            box-shadow: 0 4px 6px -1px rgba(207, 46, 46, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(207,46,46,0.2);
         }
 
         /* CARDS */
         .card {
             background: var(--bg-card); border-radius: 12px; padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0,0,0,0.05);
-            animation: fadeIn 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05); animation: fadeIn 0.3s ease;
         }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
 
         /* NOMENCLADOR */
-        .search-container { position: relative; margin-bottom: 20px; }
+        .search-container { position: relative; margin-bottom: 8px; }
         .search-container input {
             width: 100%; border-radius: 30px; border: 1px solid var(--border-color);
             padding: 14px 20px; font-size: 15px; font-family: 'Inter', sans-serif;
@@ -66,8 +69,14 @@
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); color: var(--text-main);
         }
         .search-container input:focus {
-            border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(207, 46, 46, 0.15);
+            border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(207,46,46,0.15);
             background-color: var(--bg-card);
+        }
+
+        /* 12. Contador de resultados */
+        .result-count {
+            font-size: 12px; color: var(--text-muted); text-align: right;
+            margin-bottom: 12px; padding-right: 4px; min-height: 18px;
         }
 
         .table-wrap { max-height: 520px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px; }
@@ -78,55 +87,69 @@
         tbody tr:nth-child(even) { background-color: #fafbfc; }
         tbody tr:hover { background-color: #fce8e8; }
 
+        /* 9. SKELETON LOADING */
+        .skeleton-row td { padding: 14px; }
+        .skeleton-cell {
+            height: 14px; border-radius: 6px; background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+        .skeleton-cell.w-sm { width: 60px; }
+        .skeleton-cell.w-md { width: 100px; }
+        .skeleton-cell.w-lg { width: 100%; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
         /* CALCULATOR ROWS */
-        .row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; animation: fadeIn 0.3s; }
+        .calc-cols { display: flex; gap: 24px; }
+        .calc-col { flex: 1; min-width: 0; }
+
+        .row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; animation: fadeIn 0.3s; }
         .row select {
             flex: 1; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px;
             font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: all 0.2s;
-            background: #fff; appearance: auto; color: var(--text-main);
+            background: #fff; color: var(--text-main);
         }
-        .row select:focus { border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(207, 46, 46, 0.15); }
+        .row select:focus { border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(207,46,46,0.15); }
 
         .checkbox-label {
-            display: flex; align-items: center; font-size: 14px; font-weight: 500;
-            color: var(--text-muted); cursor: pointer; user-select: none;
+            display: flex; align-items: center; font-size: 13px; font-weight: 500;
+            color: var(--text-muted); cursor: pointer; user-select: none; white-space: nowrap;
         }
-        .checkbox-label input[type="checkbox"] { margin-right: 8px; width: 16px; height: 16px; accent-color: var(--brand-color); cursor: pointer; }
+        .checkbox-label input[type="checkbox"] { margin-right: 6px; width: 15px; height: 15px; accent-color: var(--brand-color); cursor: pointer; }
 
         /* BUTTONS */
         .btn {
             border: none; background: var(--brand-color); color: #fff; border-radius: 8px;
             padding: 10px 18px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
-            box-shadow: 0 2px 4px rgba(207, 46, 46, 0.2); transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(207,46,46,0.2); transition: all 0.2s;
             display: inline-flex; align-items: center; justify-content: center;
         }
-        .btn:hover { background: var(--brand-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(207, 46, 46, 0.25); }
+        .btn:hover { background: var(--brand-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(207,46,46,0.25); }
         .btn:active { transform: translateY(0); }
 
-        .btn-add { background: transparent; color: var(--brand-color); border: 2px dashed var(--brand-color); width: 100%; margin: 10px 0 16px; box-shadow: none; }
-        .btn-add:hover { background: rgba(207, 46, 46, 0.05); color: var(--brand-hover); border-color: var(--brand-hover); box-shadow: none; }
+        .btn-add { background: transparent; color: var(--brand-color); border: 2px dashed var(--brand-color); width: 100%; margin: 8px 0 14px; box-shadow: none; font-size: 13px; padding: 8px; }
+        .btn-add:hover { background: rgba(207,46,46,0.05); box-shadow: none; transform: none; }
 
-        .btn-remove { background: #fce8e8; color: var(--brand-color); padding: 8px; width: 38px; box-shadow: none; }
-        .btn-remove:hover { background: #fad1d1; color: var(--brand-hover); box-shadow: none; }
+        .btn-remove { background: #fce8e8; color: var(--brand-color); padding: 8px; width: 34px; height: 34px; box-shadow: none; flex-shrink: 0; }
+        .btn-remove:hover { background: #fad1d1; box-shadow: none; transform: none; }
 
-        .calc-btn-container { display: flex; justify-content: center; margin: 30px 0 10px 0; }
+        .calc-btn-container { margin: 28px 0 10px; }
         #calcBtn { font-size: 16px; padding: 14px 40px; border-radius: 30px; width: 100%; }
 
         /* CABECERA CALCULADORA */
-        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; }
         .section-header .section-title { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-        .section-divider { border: none; border-top: 2px solid var(--border-color); margin: 12px 0 20px 0; }
+        .section-divider { border: none; border-top: 2px solid var(--border-color); margin: 12px 0 20px; }
 
-        /* BOTÓN LIMPIAR */
         .btn-ghost {
             background: transparent; color: var(--text-muted); border: 1.5px solid var(--border-color);
-            border-radius: 8px; padding: 8px 16px; cursor: pointer; font-family: 'Inter', sans-serif;
-            font-weight: 600; font-size: 13px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+            border-radius: 8px; padding: 7px 14px; cursor: pointer; font-family: 'Inter', sans-serif;
+            font-weight: 600; font-size: 13px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;
         }
         .btn-ghost:hover { background: #f3f4f6; color: var(--text-main); border-color: #d1d5db; }
 
         /* BOTÓN ARANCELES */
-        .aranceles-wrapper { margin-bottom: 24px; }
+        .aranceles-wrapper { margin-bottom: 20px; }
         .btn-aranceles {
             background: #f8f9fa; border: 1.5px solid var(--border-color); border-radius: 10px;
             padding: 9px 18px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600;
@@ -135,103 +158,149 @@
         }
         .btn-aranceles:hover { background: #f0f1f3; color: var(--text-main); border-color: #d1d5db; }
 
-        /* MODAL ARANCELES */
+        /* MODAL */
         .modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.45); z-index: 1000;
             align-items: center; justify-content: center;
-            animation: fadeIn 0.2s ease;
         }
         .modal-overlay.open { display: flex; }
         .modal {
-            background: var(--bg-card); border-radius: 16px; width: 420px; max-width: 95vw;
-            max-height: 80vh; display: flex; flex-direction: column;
+            background: var(--bg-card); border-radius: 16px; width: 440px; max-width: 95vw;
+            max-height: 85vh; display: flex; flex-direction: column;
             box-shadow: 0 20px 60px rgba(0,0,0,0.25);
             animation: slideUp 0.25s ease;
         }
-        @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
         .modal-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 20px 24px 16px; border-bottom: 1px solid var(--border-color);
+            padding: 18px 22px 14px; border-bottom: 1px solid var(--border-color); flex-shrink: 0;
         }
         .modal-header h3 { margin: 0; font-size: 17px; font-weight: 700; }
+        .modal-header-hint { font-size: 12px; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
         .modal-close {
             background: none; border: none; cursor: pointer; font-size: 20px;
-            color: var(--text-muted); line-height: 1; padding: 4px 8px; border-radius: 6px;
-            transition: all 0.15s;
+            color: var(--text-muted); line-height: 1; padding: 4px 8px; border-radius: 6px; transition: all 0.15s;
         }
         .modal-close:hover { background: #f3f4f6; color: var(--text-main); }
-        .modal-body { overflow-y: auto; padding: 0; }
+        .modal-body { overflow-y: auto; flex: 1; }
         .modal-body table { width: 100%; border-collapse: collapse; font-size: 14px; }
         .modal-body th {
             background: var(--brand-color); color: #fff; font-weight: 600;
-            padding: 10px 20px; text-align: left; position: sticky; top: 0;
+            padding: 10px 18px; text-align: left; position: sticky; top: 0; z-index: 1;
         }
-        .modal-body td { padding: 10px 20px; border-bottom: 1px solid var(--border-color); }
+        .modal-body td { padding: 10px 18px; border-bottom: 1px solid var(--border-color); }
+        .modal-body td:last-child { text-align: right; }
         .modal-body tbody tr:last-child td { border-bottom: none; }
         .modal-body tbody tr:nth-child(even) { background: #fafbfc; }
         .modal-body tbody tr:hover { background: #fce8e8; }
+        .modal-body tbody tr.selected { background: #fff3cd !important; }
+
+        /* 13. COMPARADOR */
+        .modal-footer {
+            border-top: 1px solid var(--border-color); padding: 14px 22px;
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 14px; flex-shrink: 0; background: #f8f9fa; border-radius: 0 0 16px 16px;
+        }
+        .modal-footer-label { color: var(--text-muted); font-weight: 500; }
+        .modal-footer-value { font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .modal-footer-hint { font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px 22px 14px; }
+
+        .arancel-check { width: 16px; height: 16px; accent-color: var(--brand-color); cursor: pointer; }
+
         .nivel-badge {
             display: inline-block; background: var(--brand-color); color: #fff;
             border-radius: 6px; padding: 2px 10px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
         }
         .monto { font-variant-numeric: tabular-nums; }
 
-        /* RESULT */
-        .result {
-            padding: 20px; background-color: var(--bg-card); border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border-left: 5px solid var(--brand-color);
-            line-height: 1.8; font-size: 15px; display: none; animation: fadeIn 0.4s; color: var(--text-main);
-            margin-top: 20px;
+        /* 7. RESULTADO VISUAL */
+        .result-box {
+            margin-top: 20px; animation: fadeIn 0.4s;
         }
-        .result .diff { font-size: 18px; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px; font-weight: 700; }
+        .result-totals { display: flex; gap: 16px; margin-bottom: 16px; }
+        .result-card {
+            flex: 1; border-radius: 12px; padding: 16px 20px;
+            border: 1px solid var(--border-color);
+            background: #f8f9fa;
+        }
+        .result-card-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .result-card-amount { font-size: 24px; font-weight: 700; color: var(--text-main); line-height: 1.1; }
+        .result-card-op { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        .result-diferencia {
+            border-radius: 12px; padding: 16px 20px;
+            border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .result-diferencia-label { font-size: 14px; font-weight: 600; color: var(--text-muted); }
+        .result-diferencia-amount { font-size: 22px; font-weight: 700; }
+        .result-diferencia-amount.positive { color: var(--green); }
+        .result-diferencia-amount.negative { color: var(--red); }
+
         .conclusion {
-            display: inline-block; padding: 6px 14px; border-radius: 8px; font-weight: 600;
-            font-size: 15px; background-color: #f3f4f6; margin-top: 14px; width: 100%;
-            box-sizing: border-box; text-align: center;
+            border-radius: 10px; padding: 12px 20px; font-weight: 700; font-size: 15px;
+            text-align: center; width: 100%;
         }
-        .conclusion.positive { background-color: #e6f4ea; color: #137333; }
-        .conclusion.negative { background-color: #fce8e8; color: #c5221f; }
+        .conclusion.positive { background: var(--green-bg); color: var(--green); }
+        .conclusion.negative { background: var(--red-bg); color: var(--red); }
 
-        .loader {
-            border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--brand-color);
-            width: 24px; height: 24px; border-radius: 50%; animation: spin 1s linear infinite;
-            display: none; margin: 20px auto;
+        /* 4. HISTORIAL */
+        .historial-section { margin-top: 28px; }
+        .historial-title {
+            font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
         }
+        .historial-title::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+        .historial-item {
+            background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center;
+            justify-content: space-between; font-size: 13px; gap: 12px;
+            cursor: pointer; transition: background 0.15s;
+        }
+        .historial-item:hover { background: #f0f1f3; }
+        .historial-tiempo { color: var(--text-muted); flex-shrink: 0; }
+        .historial-montos { flex: 1; display: flex; gap: 16px; flex-wrap: wrap; }
+        .historial-monto { display: flex; flex-direction: column; }
+        .historial-monto-label { font-size: 11px; color: var(--text-muted); }
+        .historial-monto-val { font-weight: 600; }
+        .historial-badge {
+            font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; flex-shrink: 0;
+        }
+        .historial-badge.positive { background: var(--green-bg); color: var(--green); }
+        .historial-badge.negative { background: var(--red-bg); color: var(--red); }
 
-        @keyframes spin { 0% { transform: rotate(0) } 100% { transform: rotate(360deg) } }
+        /* ANIMACIONES */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* TOAST NOTIFICATION */
+        /* TOAST */
         .toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: var(--text-main);
-            color: #fff;
-            text-align: center;
-            border-radius: 30px;
-            padding: 12px 20px;
-            position: fixed;
-            z-index: 9999;
-            left: 50%;
-            bottom: 20px;
-            transform: translateX(-50%);
-            font-size: 14px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            opacity: 0;
-            transition: opacity 0.3s, bottom 0.3s;
+            visibility: hidden; min-width: 250px; background-color: var(--text-main);
+            color: #fff; text-align: center; border-radius: 30px; padding: 12px 20px;
+            position: fixed; z-index: 9999; left: 50%; bottom: 20px;
+            transform: translateX(-50%); font-size: 14px; font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
         }
+        .toast.show { visibility: visible; opacity: 1; bottom: 40px; }
 
-        .toast.show {
-            visibility: visible;
-            opacity: 1;
-            bottom: 40px;
+        /* 6. RESPONSIVE MÓVIL */
+        @media (max-width: 640px) {
+            body { padding: 10px; }
+            h1 { font-size: 20px; margin-bottom: 16px; }
+            .tabs { flex-direction: column; gap: 8px; }
+            .card { padding: 16px; }
+            .calc-cols { flex-direction: column; gap: 0; }
+            .result-totals { flex-direction: column; gap: 10px; }
+            .result-card-amount { font-size: 20px; }
+            .section-header .section-title { font-size: 17px; }
+            .modal { max-height: 90vh; }
         }
     </style>
 </head>
 <body>
-    <div id="toast" class="toast">¡Copiado con éxito!</div>
+    <div id="toast" class="toast"></div>
     <div class="app">
       <h1>AAARBA Web App</h1>
       <div class="tabs">
@@ -239,27 +308,34 @@
         <button class="tab-btn" onclick="showTab('calculadora')">Calculadora AAARBA</button>
       </div>
 
+      <!-- TAB NOMENCLADOR -->
       <section id="tab-nomenclador" class="card">
         <h3 class="section-title">Buscador de Nomenclador</h3>
         <div class="search-container">
-            <input id="searchInput" placeholder="Buscar por código, nivel, descripción u órgano..." oninput="renderNomenclador()" />
+          <input id="searchInput" placeholder="Buscar por código, nivel, descripción u órgano..." oninput="renderNomenclador()" />
         </div>
-        <div class="loader" id="nomLoader"></div>
+        <div class="result-count" id="resultCount"></div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr>
-                <th>Código</th>
-                <th>Nivel</th>
-                <th>Descripción</th>
-                <th>Órgano</th>
-              </tr>
+              <tr><th>Código</th><th>Nivel</th><th>Descripción</th><th>Órgano</th></tr>
             </thead>
-            <tbody id="nomBody"></tbody>
+            <tbody id="nomBody">
+              <!-- 9. Skeleton loading -->
+              <tr class="skeleton-row"><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-lg"></div></td><td><div class="skeleton-cell w-md"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-lg"></div></td><td><div class="skeleton-cell w-md"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-lg"></div></td><td><div class="skeleton-cell w-md"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-lg"></div></td><td><div class="skeleton-cell w-md"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-lg"></div></td><td><div class="skeleton-cell w-md"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-lg"></div></td><td><div class="skeleton-cell w-md"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-lg"></div></td><td><div class="skeleton-cell w-md"></div></td></tr>
+              <tr class="skeleton-row"><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-sm"></div></td><td><div class="skeleton-cell w-lg"></div></td><td><div class="skeleton-cell w-md"></div></td></tr>
+            </tbody>
           </table>
         </div>
       </section>
 
+      <!-- TAB CALCULADORA -->
       <section id="tab-calculadora" class="card hidden">
         <div class="section-header">
           <h3 class="section-title">Calculadora de Honorarios</h3>
@@ -271,55 +347,101 @@
           <button class="btn-aranceles" onclick="abrirAranceles()">📋 Ver aranceles</button>
         </div>
 
-        <!-- Modal aranceles -->
+        <!-- Modal aranceles con comparador -->
         <div class="modal-overlay" id="modalAranceles" onclick="cerrarAranceles(event)">
           <div class="modal">
             <div class="modal-header">
-              <h3>Tabla de Aranceles</h3>
+              <div>
+                <h3>Tabla de Aranceles</h3>
+                <div class="modal-header-hint">Seleccioná 2 niveles para comparar</div>
+              </div>
               <button class="modal-close" onclick="cerrarAranceles()">✕</button>
             </div>
             <div class="modal-body">
               <table>
-                <thead><tr><th>Nivel</th><th>Arancel base</th></tr></thead>
+                <thead><tr><th style="width:40px;text-align:center"></th><th>Nivel</th><th style="text-align:right">Arancel base</th></tr></thead>
                 <tbody id="arancelesBody"></tbody>
               </table>
             </div>
+            <!-- 13. Footer comparador -->
+            <div class="modal-footer hidden" id="comparadorFooter">
+              <span class="modal-footer-label">Diferencia entre niveles</span>
+              <span class="modal-footer-value" id="comparadorDif">-</span>
+            </div>
+            <div class="modal-footer-hint" id="comparadorHint">Seleccioná 2 niveles para ver la diferencia</div>
           </div>
         </div>
 
-        <h4>Combinación Inicial</h4>
-        <div id="rowsInicial"></div>
-        <button class="btn btn-add" onclick="addRow('Inicial')">+ Agregar código</button>
-        <label class="checkbox-label"><input type="checkbox" id="opInicial"> Incluir Modificador OP (30%)</label>
-
-        <h4>Combinación Propuesta</h4>
-        <div id="rowsPropuesto"></div>
-        <button class="btn btn-add" onclick="addRow('Propuesto')">+ Agregar código</button>
-        <label class="checkbox-label"><input type="checkbox" id="opPropuesto"> Incluir Modificador OP (30%)</label>
+        <!-- Dos columnas: Inicial | Propuesta -->
+        <div class="calc-cols">
+          <div class="calc-col">
+            <h4>Combinación Inicial</h4>
+            <div id="rowsInicial"></div>
+            <button class="btn btn-add" onclick="addRow('Inicial')">+ Agregar código</button>
+            <label class="checkbox-label"><input type="checkbox" id="opInicial"> Modificador OP (30%)</label>
+          </div>
+          <div class="calc-col">
+            <h4>Combinación Propuesta</h4>
+            <div id="rowsPropuesto"></div>
+            <button class="btn btn-add" onclick="addRow('Propuesto')">+ Agregar código</button>
+            <label class="checkbox-label"><input type="checkbox" id="opPropuesto"> Modificador OP (30%)</label>
+          </div>
+        </div>
 
         <div class="calc-btn-container">
           <button class="btn" id="calcBtn" onclick="calculate()">Calcular</button>
         </div>
-        <div class="result" id="result"></div>
+
+        <!-- 7. Resultado visual -->
+        <div class="result-box hidden" id="resultBox">
+          <div class="result-totals">
+            <div class="result-card">
+              <div class="result-card-label">Total Inicial</div>
+              <div class="result-card-amount" id="resInicialAmt"></div>
+              <div class="result-card-op" id="resInicialOp"></div>
+            </div>
+            <div class="result-card">
+              <div class="result-card-label">Total Propuesto</div>
+              <div class="result-card-amount" id="resPropuestoAmt"></div>
+              <div class="result-card-op" id="resPropuestoOp"></div>
+            </div>
+          </div>
+          <div class="result-diferencia">
+            <span class="result-diferencia-label">Diferencia</span>
+            <span class="result-diferencia-amount" id="resDifAmt"></span>
+          </div>
+          <div class="conclusion" id="resConclusion"></div>
+        </div>
+
+        <!-- 4. Historial de la sesión -->
+        <div class="historial-section hidden" id="historialSection">
+          <div class="historial-title">Últimos cálculos</div>
+          <div id="historialList"></div>
+        </div>
       </section>
     </div>
 
     <script>
-      // Datos cargados desde archivos JSON estáticos en el mismo repositorio
       let allRows = [];
       let tarifas = {};
-      const codigos = ["", "EP", "EO", "EN", "EM", "EL", "EK", "EJ", "EI", "EH", "EG", "EF", "EE", "ED", "EC", "EB", "EA", "MI", "MF", "ME", "MD", "MB", "UD", "UN", "UO", "US", "UF"];
+      let historial = [];
+      const codigos = ["","EV","EP","EO","EN","EM","EL","EK","EJ","EI","EH","EG","EF","EE","ED","EC","EB","EA","MI","MF","ME","MD","MB","OP","UF","UO","UN","US","UD"];
 
+      /* ── TABS ── */
       function showTab(tab) {
         document.getElementById('tab-nomenclador').classList.toggle('hidden', tab !== 'nomenclador');
         document.getElementById('tab-calculadora').classList.toggle('hidden', tab !== 'calculadora');
-        const buttons = document.querySelectorAll('.tab-btn');
-        buttons[0].classList.toggle('active', tab === 'nomenclador');
-        buttons[1].classList.toggle('active', tab === 'calculadora');
+        document.querySelectorAll('.tab-btn').forEach((b, i) =>
+          b.classList.toggle('active', (tab === 'nomenclador') === (i === 0)));
       }
 
+      /* ── 2. BÚSQUEDA SIN ACENTOS ── */
+      function removeAccents(str) {
+        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      }
+
+      /* ── NOMENCLADOR ── */
       async function loadNomenclador() {
-        document.getElementById('nomLoader').style.display = 'block';
         try {
           const res = await fetch('nomenclador.json');
           if (!res.ok) throw new Error('No se pudo cargar nomenclador.json (' + res.status + ')');
@@ -328,12 +450,57 @@
         } catch (err) {
           console.error(err);
           document.getElementById('nomBody').innerHTML =
-            '<tr><td colspan="4" style="text-align:center; padding:20px; color:#c5221f;">Error al cargar datos: ' + err.message + '</td></tr>';
-        } finally {
-          document.getElementById('nomLoader').style.display = 'none';
+            '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--red);">Error al cargar datos: ' + err.message + '</td></tr>';
+          document.getElementById('resultCount').textContent = '';
         }
       }
 
+      function renderNomenclador() {
+        const raw = (document.getElementById('searchInput').value || '').trim();
+        const term = removeAccents(raw.toLowerCase());
+        const body = document.getElementById('nomBody');
+
+        const filtered = !term ? allRows : allRows.filter(function(r) {
+          const haystack = removeAccents([r.codigo, r.nivel, r.descripcion, r.organo].join(' ').toLowerCase());
+          return haystack.includes(term);
+        });
+
+        // Contador de resultados
+        const cnt = document.getElementById('resultCount');
+        if (allRows.length > 0) {
+          cnt.textContent = term
+            ? 'Mostrando ' + filtered.length + ' de ' + allRows.length + ' resultados'
+            : allRows.length + ' registros en total';
+        }
+
+        body.innerHTML = '';
+        if (filtered.length === 0) {
+          body.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-muted);">No se encontraron resultados.</td></tr>';
+          return;
+        }
+
+        const frag = document.createDocumentFragment();
+        filtered.forEach(function(r) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + esc(r.codigo) + '</td><td>' + esc(r.nivel) + '</td><td>' + esc(r.descripcion) + '</td><td>' + esc(r.organo) + '</td>';
+          tr.style.cursor = 'pointer';
+          tr.title = 'Clic para copiar';
+          tr.onclick = function() {
+            const texto = r.codigo + ' - ' + r.nivel + ' - ' + r.descripcion;
+            navigator.clipboard.writeText(texto)
+              .then(() => mostrarToast('¡Copiado: ' + r.codigo + '!'))
+              .catch(() => mostrarToast('No se pudo copiar'));
+          };
+          frag.appendChild(tr);
+        });
+        body.appendChild(frag);
+      }
+
+      function esc(str) {
+        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      }
+
+      /* ── TARIFAS ── */
       async function loadTarifas() {
         try {
           const res = await fetch('tarifas.json');
@@ -345,49 +512,15 @@
         }
       }
 
-      function renderNomenclador() {
-        const term = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-        const body = document.getElementById('nomBody');
-        body.innerHTML = '';
-
-        const filtered = !term ? allRows : allRows.filter(function(r) {
-          return [r.codigo, r.nivel, r.descripcion, r.organo].join(' ').toLowerCase().includes(term);
-        });
-
-        if (filtered.length === 0 && allRows.length > 0) {
-          const tr = document.createElement('tr');
-          tr.innerHTML = '<td colspan="4" style="text-align:center; padding:20px; color:#6b7280;">No se encontraron resultados.</td>';
-          body.appendChild(tr);
-        } else {
-          filtered.forEach(function(r) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = '<td>' + r.codigo + '</td><td>' + r.nivel + '</td><td>' + r.descripcion + '</td><td>' + r.organo + '</td>';
-            tr.style.cursor = 'pointer';
-            tr.title = 'Hacer clic para copiar fila';
-
-            tr.onclick = function() {
-              const texto = r.codigo + ' - ' + r.nivel + ' - ' + r.descripcion;
-              navigator.clipboard.writeText(texto).then(function() {
-                mostrarToast('¡Copiado: ' + r.codigo + '!');
-              }).catch(function(err) {
-                console.error('Error al copiar: ', err);
-              });
-            };
-
-            body.appendChild(tr);
-          });
-        }
+      /* ── TOAST ── */
+      function mostrarToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
       }
 
-      function mostrarToast(mensaje) {
-        const toast = document.getElementById('toast');
-        toast.textContent = mensaje;
-        toast.classList.add('show');
-        setTimeout(function() {
-          toast.classList.remove('show');
-        }, 2500);
-      }
-
+      /* ── CALCULADORA ── */
       function addRow(sec) {
         const cont = document.getElementById('rows' + sec);
         const row = document.createElement('div');
@@ -396,70 +529,157 @@
         const sel = document.createElement('select');
         codigos.forEach(function(c) {
           const o = document.createElement('option');
-          o.value = c;
-          o.text = c;
+          o.value = c; o.text = c;
           sel.appendChild(o);
         });
 
-        const lbl50 = document.createElement('label');
-        lbl50.className = 'checkbox-label';
-        lbl50.textContent = ' 50%';
-        const chk50 = document.createElement('input');
-        chk50.type = 'checkbox';
-        lbl50.prepend(chk50);
+        const lbl = document.createElement('label');
+        lbl.className = 'checkbox-label';
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        lbl.appendChild(chk);
+        lbl.appendChild(document.createTextNode(' 50%'));
 
         const btnRem = document.createElement('button');
         btnRem.innerHTML = '&#10005;';
         btnRem.className = 'btn btn-remove';
-        btnRem.onclick = function () { cont.removeChild(row); };
+        btnRem.onclick = () => cont.removeChild(row);
 
-        row.appendChild(sel);
-        row.appendChild(lbl50);
-        row.appendChild(btnRem);
+        row.append(sel, lbl, btnRem);
         cont.appendChild(row);
       }
 
       function read(sec) {
         const cont = document.getElementById('rows' + sec);
-        const opts = cont.querySelectorAll('select');
-        const checks = cont.querySelectorAll('input[type=checkbox]');
         const codes = [], facs = [];
-
-        opts.forEach(function(s) {
+        cont.querySelectorAll('select').forEach(function(s, i) {
           if (s.value) {
             codes.push(s.value);
+            const chk = cont.querySelectorAll('input[type=checkbox]')[i];
+            facs.push(chk ? chk.checked : false);
           }
         });
-        checks.forEach(function(c, i) {
-          if (i < opts.length) facs.push(c.checked);
-        });
-        return { codes: codes, facs: facs };
+        return { codes, facs };
       }
 
       function formatNumber(val) {
         return Number(val || 0).toLocaleString('es-AR', { maximumFractionDigits: 0 });
       }
 
+      function computeTotal(codes, facs, includeOp) {
+        let subtotal = 0;
+        codes.forEach(function(code, i) {
+          if (code && tarifas[code] != null) {
+            subtotal += tarifas[code] * (facs[i] ? 0.5 : 1);
+          }
+        });
+        const opValue = includeOp ? subtotal * 0.3 : 0;
+        return { sum: subtotal + opValue, op: opValue };
+      }
+
       function limpiarCalculadora() {
         ['Inicial', 'Propuesto'].forEach(function(sec) {
           document.getElementById('rows' + sec).innerHTML = '';
-          for (var i = 0; i < 4; i++) addRow(sec);
+          for (let i = 0; i < 4; i++) addRow(sec);
           document.getElementById('op' + sec).checked = false;
         });
-        const resDiv = document.getElementById('result');
-        resDiv.style.display = 'none';
-        resDiv.innerHTML = '';
+        document.getElementById('resultBox').classList.add('hidden');
       }
 
-      function abrirAranceles() {
-        if (document.getElementById('arancelesBody').children.length === 0) {
-          renderAranceles();
+      /* ── 7. RESULTADO VISUAL ── */
+      function calculate() {
+        const btn = document.getElementById('calcBtn');
+        btn.disabled = true; btn.textContent = 'Calculando...';
+
+        try {
+          const ini = read('Inicial'), prop = read('Propuesto');
+          const opIni = document.getElementById('opInicial').checked;
+          const opProp = document.getElementById('opPropuesto').checked;
+          const inicial = computeTotal(ini.codes, ini.facs, opIni);
+          const propuesto = computeTotal(prop.codes, prop.facs, opProp);
+          const diferencia = inicial.sum - propuesto.sum;
+          const esPositivo = propuesto.sum <= inicial.sum;
+
+          document.getElementById('resInicialAmt').textContent = '$ ' + formatNumber(inicial.sum);
+          document.getElementById('resInicialOp').textContent = inicial.op > 0 ? 'Inc. OP: $ ' + formatNumber(inicial.op) : '';
+          document.getElementById('resPropuestoAmt').textContent = '$ ' + formatNumber(propuesto.sum);
+          document.getElementById('resPropuestoOp').textContent = propuesto.op > 0 ? 'Inc. OP: $ ' + formatNumber(propuesto.op) : '';
+
+          const difEl = document.getElementById('resDifAmt');
+          difEl.textContent = '$ ' + formatNumber(Math.abs(diferencia));
+          difEl.className = 'result-diferencia-amount ' + (esPositivo ? 'positive' : 'negative');
+
+          const concEl = document.getElementById('resConclusion');
+          concEl.textContent = esPositivo ? '✓ Conviene generar débito' : '✕ No conviene generar débito';
+          concEl.className = 'conclusion ' + (esPositivo ? 'positive' : 'negative');
+
+          document.getElementById('resultBox').classList.remove('hidden');
+
+          // 4. Guardar en historial
+          guardarHistorial({ inicial, propuesto, diferencia, esPositivo });
+
+        } catch (err) {
+          console.error(err);
+          alert('Error al calcular: ' + err.message);
+        } finally {
+          btn.disabled = false; btn.textContent = 'Calcular';
         }
+      }
+
+      /* ── 4. HISTORIAL ── */
+      function guardarHistorial(entry) {
+        const ahora = new Date();
+        const hora = ahora.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+        historial.unshift({ ...entry, hora });
+        if (historial.length > 5) historial.pop();
+        renderHistorial();
+      }
+
+      function renderHistorial() {
+        const sec = document.getElementById('historialSection');
+        const list = document.getElementById('historialList');
+        if (historial.length === 0) { sec.classList.add('hidden'); return; }
+        sec.classList.remove('hidden');
+        list.innerHTML = historial.map(function(h, i) {
+          const cls = h.esPositivo ? 'positive' : 'negative';
+          const badge = h.esPositivo ? '✓ Débito' : '✕ Sin débito';
+          return '<div class="historial-item" onclick="verHistorial(' + i + ')">' +
+            '<span class="historial-tiempo">' + h.hora + '</span>' +
+            '<div class="historial-montos">' +
+              '<div class="historial-monto"><span class="historial-monto-label">Inicial</span><span class="historial-monto-val">$ ' + formatNumber(h.inicial.sum) + '</span></div>' +
+              '<div class="historial-monto"><span class="historial-monto-label">Propuesto</span><span class="historial-monto-val">$ ' + formatNumber(h.propuesto.sum) + '</span></div>' +
+              '<div class="historial-monto"><span class="historial-monto-label">Diferencia</span><span class="historial-monto-val">$ ' + formatNumber(Math.abs(h.diferencia)) + '</span></div>' +
+            '</div>' +
+            '<span class="historial-badge ' + cls + '">' + badge + '</span>' +
+          '</div>';
+        }).join('');
+      }
+
+      function verHistorial(i) {
+        const h = historial[i];
+        document.getElementById('resInicialAmt').textContent = '$ ' + formatNumber(h.inicial.sum);
+        document.getElementById('resInicialOp').textContent = h.inicial.op > 0 ? 'Inc. OP: $ ' + formatNumber(h.inicial.op) : '';
+        document.getElementById('resPropuestoAmt').textContent = '$ ' + formatNumber(h.propuesto.sum);
+        document.getElementById('resPropuestoOp').textContent = h.propuesto.op > 0 ? 'Inc. OP: $ ' + formatNumber(h.propuesto.op) : '';
+        const difEl = document.getElementById('resDifAmt');
+        difEl.textContent = '$ ' + formatNumber(Math.abs(h.diferencia));
+        difEl.className = 'result-diferencia-amount ' + (h.esPositivo ? 'positive' : 'negative');
+        const concEl = document.getElementById('resConclusion');
+        concEl.textContent = h.esPositivo ? '✓ Conviene generar débito' : '✕ No conviene generar débito';
+        concEl.className = 'conclusion ' + (h.esPositivo ? 'positive' : 'negative');
+        document.getElementById('resultBox').classList.remove('hidden');
+        document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      /* ── 13. MODAL ARANCELES CON COMPARADOR ── */
+      const ORDEN_NIVELES = ["EV","EP","EO","EN","EM","EL","EK","EJ","EI","EH","EG","EF","EE","ED","EC","EB","EA","MI","MF","ME","MD","MB","OP","UF","UO","UN","US","UD"];
+
+      function abrirAranceles() {
+        if (document.getElementById('arancelesBody').children.length === 0) renderAranceles();
         document.getElementById('modalAranceles').classList.add('open');
       }
 
       function cerrarAranceles(e) {
-        // Cierra si se hizo click en el overlay (fondo) o en el botón X
         if (!e || e.target === document.getElementById('modalAranceles')) {
           document.getElementById('modalAranceles').classList.remove('open');
         }
@@ -467,75 +687,44 @@
 
       function renderAranceles() {
         const body = document.getElementById('arancelesBody');
-        const orden = ["EV","EP","EO","EN","EM","EL","EK","EJ","EI","EH","EG","EF","EE","ED","EC","EB","EA","MI","MF","ME","MD","MB","OP","UF","UO","US","UD"];
-        const codOrdenados = orden.filter(c => tarifas[c] != null);
-        body.innerHTML = codOrdenados.map(function(cod) {
-          return '<tr>' +
+        const visibles = ORDEN_NIVELES.filter(c => tarifas[c] != null);
+        body.innerHTML = visibles.map(function(cod) {
+          return '<tr id="arow-' + cod + '">' +
+            '<td style="text-align:center"><input type="checkbox" class="arancel-check" data-cod="' + cod + '" data-val="' + tarifas[cod] + '" onchange="actualizarComparador(this)"></td>' +
             '<td><span class="nivel-badge">' + cod + '</span></td>' +
             '<td class="monto">$ ' + formatNumber(tarifas[cod]) + '</td>' +
-            '</tr>';
+          '</tr>';
         }).join('');
       }
 
-      function computeTotal(codes, facs, includeOp) {
-        let subtotal = 0;
-        codes.forEach(function(code, i) {
-          if (code && tarifas[code] != null) {
-            const factor = facs[i] ? 0.5 : 1;
-            subtotal += tarifas[code] * factor;
-          }
+      function actualizarComparador(changedChk) {
+        const checks = [...document.querySelectorAll('.arancel-check:checked')];
+
+        // Máximo 2 seleccionados
+        if (checks.length > 2) { changedChk.checked = false; return; }
+
+        // Highlight filas seleccionadas
+        document.querySelectorAll('.arancel-check').forEach(function(c) {
+          document.getElementById('arow-' + c.dataset.cod).classList.toggle('selected', c.checked);
         });
-        let opValue = 0;
-        if (includeOp) {
-          opValue = subtotal * 0.3;
-          subtotal += opValue;
-        }
-        return { sum: subtotal, op: opValue };
-      }
 
-      async function calculate() {
-        const btn = document.getElementById('calcBtn');
-        btn.disabled = true;
-        btn.textContent = 'Calculando...';
+        const footer = document.getElementById('comparadorFooter');
+        const hint   = document.getElementById('comparadorHint');
 
-        try {
-          const ini = read('Inicial');
-          const prop = read('Propuesto');
-          const opIni = document.getElementById('opInicial').checked;
-          const opProp = document.getElementById('opPropuesto').checked;
-
-          const inicial = computeTotal(ini.codes, ini.facs, opIni);
-          const propuesto = computeTotal(prop.codes, prop.facs, opProp);
-          const res = { inicial: inicial, propuesto: propuesto, diferencia: inicial.sum - propuesto.sum };
-
-          let out = '';
-          out += '<strong>Total Inicial:</strong> $ ' + formatNumber(res.inicial.sum) + (res.inicial.op > 0 ? ' <small>(Inc. OP: $' + formatNumber(res.inicial.op) + ')</small>' : '') + '<br>';
-          out += '<strong>Total Propuesto:</strong> $ ' + formatNumber(res.propuesto.sum) + (res.propuesto.op > 0 ? ' <small>(Inc. OP: $' + formatNumber(res.propuesto.op) + ')</small>' : '') + '<br>';
-
-          const esPositivo = res.propuesto.sum <= res.inicial.sum;
-          const difClass = esPositivo ? 'positive' : 'negative';
-          const conclusionTxt = esPositivo ? '✓ Conviene generar débito' : '✕ No conviene generar débito';
-
-          out += '<div class="diff">Diferencia: $ ' + formatNumber(res.diferencia) + '</div>';
-          out += '<div class="conclusion ' + difClass + '">' + conclusionTxt + '</div>';
-
-          const resDiv = document.getElementById('result');
-          resDiv.style.display = 'block';
-          resDiv.innerHTML = out;
-        } catch (err) {
-          console.error(err);
-          alert('Error al calcular: ' + err.message);
-        } finally {
-          btn.disabled = false;
-          btn.textContent = 'Calcular';
+        if (checks.length === 2) {
+          const dif = Math.abs(parseFloat(checks[0].dataset.val) - parseFloat(checks[1].dataset.val));
+          document.getElementById('comparadorDif').textContent = '$ ' + formatNumber(dif);
+          footer.classList.remove('hidden');
+          hint.style.display = 'none';
+        } else {
+          footer.classList.add('hidden');
+          hint.style.display = '';
         }
       }
 
+      /* ── INIT ── */
       document.addEventListener('DOMContentLoaded', function() {
-        for (let i = 0; i < 4; i++) {
-          addRow('Inicial');
-          addRow('Propuesto');
-        }
+        for (let i = 0; i < 4; i++) { addRow('Inicial'); addRow('Propuesto'); }
         loadNomenclador();
         loadTarifas();
       });
