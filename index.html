@@ -138,6 +138,49 @@
         }
         .sel-mult:focus { border-color: var(--brand-color); box-shadow: 0 0 0 3px rgba(207,46,46,0.15); }
 
+        /* BUSCADOR DE NOMENCLADOR POR FILA */
+        .row { flex-wrap: wrap; }
+        .row-search-wrap {
+            flex: 1 1 100%; position: relative; margin-bottom: 6px;
+        }
+        .inp-search-nom {
+            width: 100%; padding: 8px 14px; border: 1px dashed var(--border-color); border-radius: 8px;
+            font-family: 'Inter', sans-serif; font-size: 13px; outline: none; color: var(--text-main);
+            background: #fafbfc; transition: all 0.2s;
+        }
+        .inp-search-nom::placeholder { color: #9ca3af; }
+        .inp-search-nom:focus {
+            border-style: solid; border-color: var(--brand-color);
+            background: #fff; box-shadow: 0 0 0 3px rgba(207,46,46,0.1);
+        }
+        .inp-search-nom.filled {
+            border-style: solid; border-color: #d1d5db;
+            background: #fff; color: var(--text-main);
+        }
+        .nom-dropdown {
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 500;
+            background: #fff; border: 1px solid var(--border-color); border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 230px; overflow-y: auto;
+        }
+        .nom-dropdown-item {
+            padding: 9px 14px; display: flex; align-items: center; gap: 10px;
+            cursor: pointer; border-bottom: 1px solid var(--border-color); transition: background 0.12s;
+        }
+        .nom-dropdown-item:last-child { border-bottom: none; }
+        .nom-dropdown-item:hover { background: #fce8e8; }
+        .nom-drop-nivel {
+            flex-shrink: 0; background: var(--brand-color); color: #fff;
+            border-radius: 5px; padding: 1px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+        }
+        .nom-drop-texto {
+            font-size: 13px; color: var(--text-main); white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .nom-drop-texto em { color: var(--text-muted); font-style: normal; font-size: 12px; }
+        .nom-dropdown-empty {
+            padding: 12px 14px; font-size: 13px; color: var(--text-muted); text-align: center;
+        }
+
         .btn-remove { background: #fce8e8; color: var(--brand-color); padding: 8px; width: 34px; height: 34px; box-shadow: none; flex-shrink: 0; }
         .btn-remove:hover { background: #fad1d1; box-shadow: none; transform: none; }
 
@@ -534,7 +577,64 @@
         const row = document.createElement('div');
         row.className = 'row';
 
-        // Selector de nivel
+        // ── Buscador de nomenclador (línea 1) ──
+        const searchWrap = document.createElement('div');
+        searchWrap.className = 'row-search-wrap';
+
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'inp-search-nom';
+        inp.placeholder = '🔍 Buscar procedimiento en nomenclador (opcional)...';
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'nom-dropdown hidden';
+
+        inp.addEventListener('input', function() {
+          const term = removeAccents(inp.value.toLowerCase().trim());
+          dropdown.innerHTML = '';
+          if (!term) { dropdown.classList.add('hidden'); return; }
+
+          const matches = allRows.length === 0
+            ? []
+            : allRows.filter(function(r) {
+                return removeAccents([r.codigo, r.descripcion, r.organo, r.nivel].join(' ').toLowerCase()).includes(term);
+              }).slice(0, 8);
+
+          if (matches.length === 0) {
+            dropdown.innerHTML = '<div class="nom-dropdown-empty">Sin resultados para "' + esc(inp.value) + '"</div>';
+            dropdown.classList.remove('hidden');
+            return;
+          }
+
+          matches.forEach(function(r) {
+            const item = document.createElement('div');
+            item.className = 'nom-dropdown-item';
+            item.innerHTML =
+              '<span class="nom-drop-nivel">' + esc(r.nivel) + '</span>' +
+              '<span class="nom-drop-texto">' + esc(r.descripcion) + ' <em>— ' + esc(r.codigo) + '</em></span>';
+            item.addEventListener('mousedown', function(e) {
+              e.preventDefault(); // evita blur antes del click
+              sel.value = r.nivel;
+              inp.value = r.descripcion + '  [' + r.codigo + ']';
+              inp.classList.add('filled');
+              dropdown.classList.add('hidden');
+            });
+            dropdown.appendChild(item);
+          });
+          dropdown.classList.remove('hidden');
+        });
+
+        inp.addEventListener('blur', function() {
+          setTimeout(() => dropdown.classList.add('hidden'), 150);
+        });
+
+        inp.addEventListener('focus', function() {
+          if (inp.value.trim()) inp.dispatchEvent(new Event('input'));
+        });
+
+        searchWrap.append(inp, dropdown);
+
+        // ── Selector de nivel (línea 2) ──
         const sel = document.createElement('select');
         sel.className = 'sel-nivel';
         codigos.forEach(function(c) {
@@ -543,7 +643,7 @@
           sel.appendChild(o);
         });
 
-        // Selector de multiplicador
+        // ── Multiplicador ──
         const selMult = document.createElement('select');
         selMult.className = 'sel-mult';
         selMult.title = 'Multiplicador';
@@ -553,7 +653,7 @@
           selMult.appendChild(o);
         });
 
-        // Checkbox 50%
+        // ── Checkbox 50% ──
         const lbl = document.createElement('label');
         lbl.className = 'checkbox-label';
         const chk = document.createElement('input');
@@ -561,13 +661,13 @@
         lbl.appendChild(chk);
         lbl.appendChild(document.createTextNode(' 50%'));
 
-        // Botón eliminar
+        // ── Botón eliminar ──
         const btnRem = document.createElement('button');
         btnRem.innerHTML = '&#10005;';
         btnRem.className = 'btn btn-remove';
         btnRem.onclick = () => cont.removeChild(row);
 
-        row.append(sel, selMult, lbl, btnRem);
+        row.append(searchWrap, sel, selMult, lbl, btnRem);
         cont.appendChild(row);
       }
 
