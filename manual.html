@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual de Usuario — AAARBA Web App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red:       #cf2e2e;
+      --red-dark:  #a01e1e;
+      --red-light: #fce8e8;
+      --bg:        #f8f9fb;
+      --surface:   #ffffff;
+      --border:    #e5e7eb;
+      --text:      #111827;
+      --muted:     #6b7280;
+      --sidebar-w: 280px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-logo-badge {
+      width: 38px; height: 38px;
+      background: var(--red);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: white;
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .sidebar-logo-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .sidebar-version {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .sidebar-version span {
+      background: var(--red-light);
+      color: var(--red);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .sidebar-nav { padding: 16px 12px; flex: 1; }
+
+    .nav-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0 12px;
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+
+    .nav-section-title:first-child { margin-top: 0; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s;
+      margin-bottom: 2px;
+    }
+
+    .nav-item:hover { background: var(--bg); color: var(--text); }
+
+    .nav-item.active {
+      background: var(--red-light);
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    .nav-item-num {
+      width: 20px; height: 20px;
+      border-radius: 6px;
+      background: var(--border);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .nav-item.active .nav-item-num {
+      background: var(--red);
+      color: white;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+    }
+
+    /* ── TOP BANNER ── */
+    .top-banner {
+      width: 100%;
+      position: relative;
+    }
+
+    .top-banner img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .top-banner-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(207,46,46,0.15) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 48px 64px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--red-light);
+      color: var(--red);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 600px;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 24px;
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .hero-meta-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .hero-meta-val { font-size: 14px; color: var(--text); font-weight: 600; }
+
+    /* ── CONTENT ── */
+    .content { padding: 0 64px 80px; }
+
+    /* ── SECTIONS ── */
+    .section {
+      padding-top: 64px;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    .section h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .section-intro {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 680px;
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 48px 0;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-icon {
+      width: 28px; height: 28px;
+      background: var(--red-light);
+      color: var(--red);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    /* ── SCREENSHOT FRAME ── */
+    .screenshot-wrap {
+      margin: 28px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    .screenshot-bar {
+      background: #f3f4f6;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .screenshot-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ff5f57; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #28c840; }
+
+    .screenshot-url {
+      flex: 1;
+      background: white;
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      margin-left: 8px;
+    }
+
+    .screenshot-img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .screenshot-caption {
+      background: var(--bg);
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      border-top: 1px solid var(--border);
+      font-style: italic;
+    }
+
+    /* ── STEPS ── */
+    .steps { margin: 20px 0; }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--red);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-body { flex: 1; }
+
+    .step-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .callout-info { background: #eff6ff; border: 1px solid #bfdbfe; }
+    .callout-warn { background: #fffbeb; border: 1px solid #fde68a; }
+    .callout-tip  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+
+    .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+    .callout-text {
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .callout-text b { font-weight: 700; }
+
+    /* ── FEATURES GRID ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .feature-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .feature-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .feature-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .feature-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── TIPS ── */
+    .tips-list { margin: 16px 0; }
+
+    .tip-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tip-item:last-child { border-bottom: none; }
+
+    .tip-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--red-light);
+      color: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .tip-content { flex: 1; }
+    .tip-title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .tip-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── FAQ ── */
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .faq-q {
+      padding: 16px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      user-select: none;
+    }
+
+    .faq-q:hover { background: var(--bg); }
+
+    .faq-chevron {
+      color: var(--muted);
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+
+    .faq-a {
+      display: none;
+      padding: 0 20px 16px;
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.6;
+      background: white;
+    }
+
+    .faq-item.open .faq-a { display: block; }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+
+    /* ── TABLE ── */
+    .nice-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 16px 0;
+    }
+
+    .nice-table th {
+      background: var(--red);
+      color: white;
+      padding: 10px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nice-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+
+    .nice-table tbody tr:hover { background: var(--bg); }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-red { background: var(--red-light); color: var(--red); }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-gray { background: var(--border); color: var(--muted); }
+
+    /* ── BACK TO TOP ── */
+    .back-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 44px; height: 44px;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(207,46,46,0.3);
+      transition: all 0.2s;
+      z-index: 200;
+    }
+
+    .back-top:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(207,46,46,0.4); }
+    .back-top.show { display: flex; }
+
+    /* ── PRINT ── */
+    @media print {
+      .sidebar, .back-top { display: none !important; }
+      .main { margin-left: 0; }
+      .content { padding: 0 32px; }
+      .hero { padding: 32px; }
+      .faq-a { display: block !important; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .hero, .content { padding-left: 24px; padding-right: 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-badge">AA</div>
+      <div>
+        <div class="sidebar-logo-text">AAARBA Web App</div>
+        <div class="sidebar-logo-sub">Manual de Usuario</div>
+      </div>
+    </div>
+    <div class="sidebar-version">Versión <span>1.0</span> — Swiss Medical</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">Contenido</div>
+    <a href="#introduccion"  class="nav-item active"><span class="nav-item-num">1</span> Introducción</a>
+    <a href="#acceso"        class="nav-item"><span class="nav-item-num">2</span> Acceso a la App</a>
+    <a href="#login"         class="nav-item"><span class="nav-item-num">3</span> Login y Seguridad</a>
+    <a href="#nomenclador"   class="nav-item"><span class="nav-item-num">4</span> Tab Nomenclador</a>
+    <a href="#calculadora"   class="nav-item"><span class="nav-item-num">5</span> Tab Calculadora</a>
+    <a href="#busquedafila"  class="nav-item"><span class="nav-item-num">6</span> Búsqueda por Fila</a>
+    <a href="#aranceles"     class="nav-item"><span class="nav-item-num">7</span> Tabla de Aranceles</a>
+    <a href="#historial"     class="nav-item"><span class="nav-item-num">8</span> Historial</a>
+    <a href="#tips"          class="nav-item"><span class="nav-item-num">9</span> Tips y Prácticas</a>
+    <a href="#faq"           class="nav-item"><span class="nav-item-num">10</span> FAQ</a>
+  </nav>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- BANNER -->
+  <div class="top-banner">
+    <img src="img/banner.png" alt="AAARBA Web App" />
+    <div class="top-banner-overlay"></div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">📖 Documentación oficial</div>
+    <h1>Manual de Usuario<br>AAARBA Web App</h1>
+    <p class="hero-sub">Guía completa para utilizar el Nomenclador y la Calculadora de Honorarios Quirúrgicos de Swiss Medical.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Versión</span>
+        <span class="hero-meta-val">1.0</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Organización</span>
+        <span class="hero-meta-val">Swiss Medical S.A.</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Aplicación</span>
+        <span class="hero-meta-val">aaarbawebapp.netlify.app</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Procedimientos</span>
+        <span class="hero-meta-val">1.877 registros</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ── 1. INTRODUCCIÓN ── -->
+    <section class="section" id="introduccion">
+      <div class="section-tag">Sección 01</div>
+      <h2>Introducción</h2>
+      <p class="section-intro">AAARBA Web App es una herramienta especializada para la auditoría de honorarios quirúrgicos, basada en el Nomenclador de Procedimientos Quirúrgicos AAARBA. Permite buscar códigos, calcular y comparar honorarios.</p>
+
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon">🔍</div>
+          <div class="feature-title">Buscador de Nomenclador</div>
+          <div class="feature-desc">Acceda a 1.877 procedimientos médicos con sus códigos, niveles y descripciones. Búsqueda en tiempo real.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🧮</div>
+          <div class="feature-title">Calculadora de Honorarios</div>
+          <div class="feature-desc">Compare combinaciones de procedimientos con modificadores: factor 50%, OP 30% y multiplicadores x1 a x5.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📋</div>
+          <div class="feature-title">Tabla de Aranceles</div>
+          <div class="feature-desc">Consulte el arancel vigente de cada nivel. Compare dos niveles para ver su diferencia al instante.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-title">Acceso Seguro</div>
+          <div class="feature-desc">Login protegido con email y contraseña. Solo usuarios autorizados por Swiss Medical pueden acceder.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── 2. ACCESO ── -->
+    <section class="section" id="acceso">
+      <div class="section-tag">Sección 02</div>
+      <h2>Acceso a la Aplicación</h2>
+      <p class="section-intro">La aplicación funciona directamente en el navegador web. No requiere instalación de ningún software.</p>
+
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🌐</span> URL de la Aplicación</div>
+        <code style="font-size:15px; color:var(--red); font-family:monospace; background:var(--red-light); padding:8px 16px; border-radius:8px; display:block; margin-bottom:12px;">https://aaarbawebapp.netlify.app</code>
+        <p style="font-size:13px; color:var(--muted);">Guarde esta URL en sus favoritos para acceder rápidamente.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🖥️</span> Navegadores Recomendados</div>
+        <table class="nice-table">
+          <thead><tr><th>Navegador</th><th>Versión mínima</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Google Chrome</td><td>90+</td><td><span class="badge badge-green">✓ Recomendado</span></td></tr>
+            <tr><td>Microsoft Edge</td><td>90+</td><td><span class="badge badge-green">✓ Compatible</span></td></tr>
+            <tr><td>Mozilla Firefox</td><td>88+</td><td><span class="badge badge-green">✓ Compatible</span></td></tr>
+            <tr><td>Safari</td><td>14+</td><td><span class="badge badge-green">✓ Compatible</span></td></tr>
+            <tr><td>Internet Explorer</td><td>Cualquiera</td><td><span class="badge badge-red">✗ No compatible</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-text">La aplicación es <b>responsive</b>: también puede usarla desde su celular o tablet, aunque se recomienda el uso en computadora para mayor comodidad.</div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── 3. LOGIN ── -->
+    <section class="section" id="login">
+      <div class="section-tag">Sección 03</div>
+      <h2>Login y Seguridad</h2>
+      <p class="section-intro">Antes de acceder, deberá autenticarse con sus credenciales. Solo los usuarios invitados por el administrador pueden ingresar.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Abra la aplicación en el navegador</div>
+            <div class="step-desc">Ingrese la URL <code style="background:var(--bg); padding:2px 6px; border-radius:4px; font-size:12px;">https://aaarbawebapp.netlify.app</code>. Verá el banner principal y un spinner de "Verificando acceso..."</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Se abre el popup de login automáticamente</div>
+            <div class="step-desc">La pantalla de login aparece centrada. Ingrese su email y contraseña proporcionados por el administrador.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app</div>
+        </div>
+        <img class="screenshot-img" src="img/01-login.PNG" alt="Pantalla de login" />
+        <div class="screenshot-caption">Pantalla de login — ingrese su email y contraseña para acceder</div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Ingrese sus credenciales y haga clic en "Log in"</div>
+            <div class="step-desc">Una vez autenticado, el popup se cierra y la aplicación queda disponible. En la barra superior verá su email y el botón "Cerrar sesión".</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app</div>
+        </div>
+        <img class="screenshot-img" src="img/02-banner-usuario.PNG" alt="Banner con usuario logueado" style="max-height:80px; object-fit:cover;" />
+        <div class="screenshot-caption">Barra superior mostrando el email del usuario y el botón de cerrar sesión</div>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-text"><b>¿Olvidó su contraseña?</b> En la pantalla de login, haga clic en "Forgot password?". Recibirá un email con el link para restablecerla. No necesita contactar al administrador.</div>
+      </div>
+
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-text"><b>Cerrar sesión:</b> Haga clic en el botón "Cerrar sesión" en la barra superior. Será redirigido a la pantalla de login. Se recomienda cerrar sesión al terminar de trabajar.</div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── 4. NOMENCLADOR ── -->
+    <section class="section" id="nomenclador">
+      <div class="section-tag">Sección 04</div>
+      <h2>Tab Nomenclador AAARBA</h2>
+      <p class="section-intro">El Nomenclador es la pestaña principal. Contiene los 1.877 procedimientos médicos del nomenclador AAARBA con sus códigos, niveles de complejidad y descripciones.</p>
+
+      <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app — Nomenclador AAARBA</div>
+        </div>
+        <img class="screenshot-img" src="img/03-nomenclador-inicial.PNG" alt="Nomenclador inicial" />
+        <div class="screenshot-caption">Vista inicial del Nomenclador con todos los procedimientos cargados</div>
+      </div>
+
+      <div class="card" style="margin-top:32px;">
+        <div class="card-title"><span class="card-title-icon">🔍</span> Cómo buscar un procedimiento</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Escriba en el campo de búsqueda</div>
+              <div class="step-desc">Puede buscar por código, nivel, descripción u órgano. <b>No necesita tildes</b>: "apendicectomia" encuentra "Apendicectomía".</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Vea los resultados filtrados en tiempo real</div>
+              <div class="step-desc">La tabla se actualiza automáticamente. Un contador debajo del buscador indica cuántos resultados hay.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Haga clic en una fila para copiar</div>
+              <div class="step-desc">Al hacer clic en cualquier fila, se copia automáticamente al portapapeles en el formato: <b>CÓDIGO — NIVEL — DESCRIPCIÓN</b>. Recibirá una notificación de confirmación.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app — Búsqueda activa</div>
+        </div>
+        <img class="screenshot-img" src="img/04-nomenclador-busqueda.PNG" alt="Búsqueda en nomenclador" />
+        <div class="screenshot-caption">Búsqueda activa — la tabla filtra en tiempo real y el contador muestra cuántos resultados coinciden</div>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-text"><b>Tip:</b> Para volver a ver todos los procedimientos, borre el texto del campo de búsqueda.</div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── 5. CALCULADORA ── -->
+    <section class="section" id="calculadora">
+      <div class="section-tag">Sección 05</div>
+      <h2>Tab Calculadora de Honorarios</h2>
+      <p class="section-intro">La Calculadora es la herramienta central de auditoría. Permite comparar dos combinaciones de procedimientos (Inicial vs Propuesta) con todos sus modificadores y obtener la diferencia de honorarios.</p>
+
+      <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app — Calculadora</div>
+        </div>
+        <img class="screenshot-img" src="img/06-calculadora-inicial.PNG" alt="Calculadora inicial" />
+        <div class="screenshot-caption">Calculadora en estado inicial — dos columnas: Combinación Inicial (izquierda) y Combinación Propuesta (derecha)</div>
+      </div>
+
+      <div class="card" style="margin-top:32px;">
+        <div class="card-title"><span class="card-title-icon">📝</span> Componentes de cada fila</div>
+        <table class="nice-table">
+          <thead><tr><th>Componente</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><b>🔍 Buscador</b></td><td>Campo opcional para buscar el procedimiento por descripción. Auto-completa el nivel al seleccionar.</td></tr>
+            <tr><td><b>Nivel</b></td><td>Desplegable con los 27 niveles del nomenclador (EA, EB, EP, etc.).</td></tr>
+            <tr><td><b>Multiplicador (x1–x5)</b></td><td>Multiplica el arancel base. Útil cuando el mismo procedimiento se realiza varias veces.</td></tr>
+            <tr><td><b>50%</b></td><td>Checkbox que aplica un factor del 50% al arancel del procedimiento.</td></tr>
+            <tr><td><b>✕ Eliminar</b></td><td>Quita esa fila de la combinación.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="screenshot-wrap" style="margin-top:24px;">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app — Combinaciones completadas</div>
+        </div>
+        <img class="screenshot-img" src="img/07-calculadora-filas-completas.PNG" alt="Calculadora con filas" />
+        <div class="screenshot-caption">Calculadora con combinaciones cargadas — niveles seleccionados, multiplicadores y factores aplicados</div>
+      </div>
+
+      <div class="card" style="margin-top:24px;">
+        <div class="card-title"><span class="card-title-icon">⚙️</span> Modificadores de columna</div>
+        <div style="font-size:14px; color:var(--muted); margin-bottom:12px;">Debajo de cada columna, encontrará:</div>
+        <div class="tips-list">
+          <div class="tip-item">
+            <div class="tip-icon">➕</div>
+            <div class="tip-content">
+              <div class="tip-title">+ Agregar código</div>
+              <div class="tip-desc">Agrega una nueva fila vacía a la combinación para sumar más procedimientos.</div>
+            </div>
+          </div>
+          <div class="tip-item">
+            <div class="tip-icon">🏥</div>
+            <div class="tip-content">
+              <div class="tip-title">Modificador OP (30%)</div>
+              <div class="tip-desc">Si está marcado, se suma un 30% sobre el subtotal de todos los procedimientos de esa columna.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-info" style="margin-top:16px;">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-text"><b>Botón "↺ Limpiar"</b> (esquina superior derecha de la calculadora): resetea toda la calculadora volviendo a 4 filas vacías y sin resultados.</div>
+      </div>
+
+      <div style="margin-top:28px;">
+        <div class="card-title" style="font-size:15px; font-weight:700; color:var(--text); margin-bottom:16px;">Cómo hacer un cálculo completo</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Complete la Combinación Inicial</div>
+              <div class="step-desc">Seleccione los niveles, ajuste multiplicadores y factor 50% para cada procedimiento. Active OP si corresponde.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Complete la Combinación Propuesta</div>
+              <div class="step-desc">Repita el proceso en la columna derecha con los procedimientos propuestos.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Haga clic en "Calcular"</div>
+              <div class="step-desc">El botón está centrado al pie de las dos columnas. El resultado aparece debajo.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app — Resultado del cálculo</div>
+        </div>
+        <img class="screenshot-img" src="img/08-calculadora-resultado.PNG" alt="Resultado del cálculo" />
+        <div class="screenshot-caption">Resultado del cálculo — tarjetas con totales, diferencia en color y conclusión de auditoría</div>
+      </div>
+
+      <div class="card" style="margin-top:24px;">
+        <div class="card-title"><span class="card-title-icon">📊</span> Cómo interpretar el resultado</div>
+        <div class="tips-list">
+          <div class="tip-item">
+            <div class="tip-icon" style="background:#dbeafe; color:#1d4ed8;">$</div>
+            <div class="tip-content">
+              <div class="tip-title">Total Inicial / Total Propuesto</div>
+              <div class="tip-desc">Suma de todos los procedimientos de cada columna con sus modificadores aplicados.</div>
+            </div>
+          </div>
+          <div class="tip-item">
+            <div class="tip-icon" style="background:#f0fdf4; color:#166534;">△</div>
+            <div class="tip-content">
+              <div class="tip-title">Diferencia (en verde)</div>
+              <div class="tip-desc">El Propuesto es menor que el Inicial. Conviene generar el débito.</div>
+            </div>
+          </div>
+          <div class="tip-item">
+            <div class="tip-icon" style="background:var(--red-light); color:var(--red);">△</div>
+            <div class="tip-content">
+              <div class="tip-title">Diferencia (en rojo)</div>
+              <div class="tip-desc">El Propuesto es mayor que el Inicial. No conviene generar el débito.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── 6. BÚSQUEDA POR FILA ── -->
+    <section class="section" id="busquedafila">
+      <div class="section-tag">Sección 06</div>
+      <h2>Búsqueda por Fila en la Calculadora</h2>
+      <p class="section-intro">Cada fila de la calculadora tiene un campo de búsqueda integrado que permite encontrar un procedimiento del nomenclador y auto-completar el nivel, sin tener que ir al Tab Nomenclador.</p>
+
+      <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app — Buscador por fila</div>
+        </div>
+        <img class="screenshot-img" src="img/10-buscador-fila.jpeg" alt="Buscador por fila" />
+        <div class="screenshot-caption">Campo de búsqueda de nomenclador integrado en cada fila de la calculadora</div>
+      </div>
+
+      <div class="steps" style="margin-top:28px;">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Haga clic en el campo "🔍 Buscar procedimiento..."</div>
+            <div class="step-desc">Está ubicado en la parte superior de cada fila, antes del selector de nivel.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Empiece a escribir el nombre del procedimiento</div>
+            <div class="step-desc">Aparecerá un dropdown con hasta 8 sugerencias. Puede escribir con o sin tildes.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Seleccione el procedimiento</div>
+            <div class="step-desc">Al hacer clic en un ítem del dropdown, el nivel se <b>auto-completa automáticamente</b>. El campo muestra la descripción y el código del procedimiento seleccionado.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Ajuste multiplicador y factor 50% si necesita</div>
+            <div class="step-desc">El nivel ya estará seleccionado. Solo reste configurar los modificadores adicionales.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-text"><b>Tip:</b> Si prefiere seleccionar el nivel directamente (sin buscar), simplemente ignore el campo de búsqueda y use el desplegable de nivel. Ambas formas son válidas.</div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── 7. ARANCELES ── -->
+    <section class="section" id="aranceles">
+      <div class="section-tag">Sección 07</div>
+      <h2>Tabla de Aranceles y Comparador</h2>
+      <p class="section-intro">El popup de aranceles muestra el valor vigente de cada nivel. Ideal para consultas rápidas sin necesidad de ingresar datos en la calculadora.</p>
+
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">📋</span> Cómo acceder</div>
+        <p style="font-size:14px; color:var(--muted);">En la pestaña <b>Calculadora</b>, haga clic en el botón <b>"📋 Ver aranceles"</b> debajo del encabezado. Se abrirá un modal centrado con la tabla completa.</p>
+      </div>
+
+      <div class="screenshot-wrap" style="margin-top:24px;">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app — Tabla de Aranceles</div>
+        </div>
+        <img class="screenshot-img" src="img/11-aranceles-popup.PNG" alt="Popup de aranceles" />
+        <div class="screenshot-caption">Popup de aranceles con los 27 niveles y sus valores vigentes</div>
+      </div>
+
+      <div class="card" style="margin-top:28px;">
+        <div class="card-title"><span class="card-title-icon">⚖️</span> Comparador de Niveles</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Marque el checkbox de dos niveles</div>
+              <div class="step-desc">En la primera columna de la tabla, haga clic en el checkbox de los dos niveles que desea comparar. Solo puede seleccionar dos a la vez.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">La diferencia aparece al pie del popup</div>
+              <div class="step-desc">Al seleccionar el segundo nivel, se calcula y muestra automáticamente la diferencia de arancel entre ambos.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app — Comparador activo</div>
+        </div>
+        <img class="screenshot-img" src="img/12-comparador.PNG" alt="Comparador de aranceles" />
+        <div class="screenshot-caption">Comparador activo — dos niveles seleccionados y diferencia calculada al pie</div>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-text"><b>Actualización de aranceles:</b> Los valores se actualizan mensualmente. Si necesita verificar la vigencia de los datos, consulte con el administrador del sistema.</div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── 8. HISTORIAL ── -->
+    <section class="section" id="historial">
+      <div class="section-tag">Sección 08</div>
+      <h2>Historial de Cálculos</h2>
+      <p class="section-intro">La aplicación registra los últimos 5 cálculos realizados durante la sesión. Permite volver a ver resultados anteriores sin tener que re-ingresar los datos.</p>
+
+      <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+          <div class="screenshot-dot dot-red"></div>
+          <div class="screenshot-dot dot-yellow"></div>
+          <div class="screenshot-dot dot-green"></div>
+          <div class="screenshot-url">aaarbawebapp.netlify.app — Historial de cálculos</div>
+        </div>
+        <img class="screenshot-img" src="img/09-calculadora-historial.PNG" alt="Historial de cálculos" />
+        <div class="screenshot-caption">Sección "Últimos cálculos" — aparece automáticamente debajo del resultado</div>
+      </div>
+
+      <div class="card" style="margin-top:28px;">
+        <div class="card-title"><span class="card-title-icon">🕐</span> Qué muestra cada ítem del historial</div>
+        <div class="tips-list">
+          <div class="tip-item">
+            <div class="tip-icon">🕐</div>
+            <div class="tip-content">
+              <div class="tip-title">Hora del cálculo</div>
+              <div class="tip-desc">Muestra la hora exacta en que se realizó (ej: 14:32).</div>
+            </div>
+          </div>
+          <div class="tip-item">
+            <div class="tip-icon">$</div>
+            <div class="tip-content">
+              <div class="tip-title">Total Inicial, Propuesto y Diferencia</div>
+              <div class="tip-desc">Los tres valores del resultado de ese cálculo.</div>
+            </div>
+          </div>
+          <div class="tip-item">
+            <div class="tip-icon">✓</div>
+            <div class="tip-content">
+              <div class="tip-title">Insignia de conclusión</div>
+              <div class="tip-desc">Verde (✓ Débito) o Rojo (✕ Sin débito) según el resultado.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-text"><b>Importante:</b> El historial es <b>temporal</b>. Se borra al cerrar sesión o recargar la página. Para guardar resultados importantes, realice una captura de pantalla o anote los valores.</div>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-text"><b>Tip:</b> Haga clic en cualquier ítem del historial para restaurar ese resultado en la sección de resultados arriba, sin necesidad de recalcular.</div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── 9. TIPS ── -->
+    <section class="section" id="tips">
+      <div class="section-tag">Sección 09</div>
+      <h2>Tips y Mejores Prácticas</h2>
+      <p class="section-intro">Recomendaciones para aprovechar la aplicación al máximo y evitar errores comunes.</p>
+
+      <div class="tips-list">
+        <div class="tip-item">
+          <div class="tip-icon">🔤</div>
+          <div class="tip-content">
+            <div class="tip-title">Búsqueda sin tildes</div>
+            <div class="tip-desc">Puede escribir "colecistectomia" y encontrará "Colecistectomía". La búsqueda es flexible con acentos y mayúsculas.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">📋</div>
+          <div class="tip-content">
+            <div class="tip-title">Copiar desde el Nomenclador</div>
+            <div class="tip-desc">Al hacer clic en una fila, obtiene el formato "CÓDIGO - NIVEL - DESCRIPCIÓN" listo para pegar en documentos o informes.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">✖️</div>
+          <div class="tip-content">
+            <div class="tip-title">Usar multiplicadores eficientemente</div>
+            <div class="tip-desc">En lugar de agregar la misma fila dos veces para un ED doble, use una sola fila ED con multiplicador x2. Es más rápido y evita errores.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">⚡</div>
+          <div class="tip-content">
+            <div class="tip-title">Buscar directamente en la fila</div>
+            <div class="tip-desc">Para ingresar procedimientos rápidamente, use el buscador integrado en cada fila en lugar de ir y volver del Tab Nomenclador.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">↺</div>
+          <div class="tip-content">
+            <div class="tip-title">Limpiar antes de cada nuevo caso</div>
+            <div class="tip-desc">Haga clic en "↺ Limpiar" antes de comenzar un nuevo análisis para evitar mezclar datos de casos distintos.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">📸</div>
+          <div class="tip-content">
+            <div class="tip-title">Guardar resultados importantes</div>
+            <div class="tip-desc">El historial se borra al cerrar sesión. Capture pantallas (Win + Shift + S) de los resultados que necesite conservar.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">📐</div>
+          <div class="tip-content">
+            <div class="tip-title">Factor 50% vs Multiplicador</div>
+            <div class="tip-desc">Son modificadores independientes. El 50% reduce el arancel a la mitad. El multiplicador (x2, x3) lo duplica o triplica. Se aplican juntos: ED con x2 y 50% = ED × 2 × 0.5 = 1 ED completo.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🏥</div>
+          <div class="tip-content">
+            <div class="tip-title">El OP 30% se aplica al final</div>
+            <div class="tip-desc">El modificador OP se calcula sobre el subtotal de todos los procedimientos de esa columna. No se aplica procedimiento por procedimiento.</div>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🖨️</div>
+          <div class="tip-content">
+            <div class="tip-title">Imprimir este manual</div>
+            <div class="tip-desc">Use Ctrl + P en su navegador para imprimir este manual. Está optimizado para impresión y se ve correctamente en papel.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── 10. FAQ ── -->
+    <section class="section" id="faq">
+      <div class="section-tag">Sección 10</div>
+      <h2>Preguntas Frecuentes</h2>
+      <p class="section-intro">Respuestas a las dudas más comunes de los usuarios de la plataforma.</p>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">¿Olvidé mi contraseña, qué hago? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">En la pantalla de login, haga clic en <b>"Forgot password?"</b>. Recibirá un email con un enlace para restablecerla. Siga las instrucciones del email. No necesita contactar al administrador.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">¿Por qué no aparece el popup de aranceles? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">Asegúrese de estar en la pestaña <b>"Calculadora AAARBA"</b> y de haber iniciado sesión correctamente. Luego haga clic en el botón <b>"📋 Ver aranceles"</b>.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">¿Cómo sé cuántos resultados encontró la búsqueda? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">Debajo del campo de búsqueda aparece un contador: <b>"Mostrando X de 1877 resultados"</b>. Si dice "No se encontraron resultados", intente sin tildes o con otra palabra clave.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">¿Puedo imprimir o exportar los cálculos? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">Puede usar <b>Ctrl + P</b> en el navegador para imprimir la pantalla actual. También puede hacer una captura de pantalla con <b>Win + Shift + S</b>. Versiones futuras incluirán exportación directa a PDF.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">¿Dónde se guardan mis cálculos? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">Los cálculos se guardan temporalmente en el <b>historial de sesión</b> (últimos 5). Al cerrar sesión o recargar la página, se borran. No hay almacenamiento persistente por usuario en la versión actual.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">¿Los datos de la empresa se envían a algún servidor externo? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">No. La aplicación funciona en su navegador y los cálculos se realizan localmente. Solo se verifica el <b>login</b> contra el servidor de Netlify Identity. Ningún dato de procedimientos o montos se envía a servidores externos.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">¿Qué hago si algo no funciona correctamente? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">Intente <b>recargar la página</b> (F5 o Ctrl + R). Si el problema persiste, cierre sesión y vuelva a iniciarla. Si continúa, contacte al administrador del sistema.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">¿Con qué frecuencia se actualizan los aranceles? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">Los aranceles se actualizan <b>mensualmente</b>. Si tiene dudas sobre la vigencia de los valores actuales, consulte con el administrador del sistema.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">¿Puedo usar la app desde el celular? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">Sí, la aplicación es <b>responsive</b> y funciona en celulares y tablets. Sin embargo, se recomienda el uso en computadora para mayor comodidad, especialmente en la Calculadora.</div>
+      </div>
+
+    </section>
+
+    <div style="padding-bottom: 40px; padding-top: 48px; text-align: center; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); margin-top: 48px;">
+      <div style="margin-bottom:6px; font-weight: 600; color:var(--text);">AAARBA Web App — Manual de Usuario v1.0</div>
+      <div>Swiss Medical S.A. · Departamento de Auditoría Médica · Confidencial de uso interno</div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- BACK TO TOP -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // FAQ toggle
+  function toggleFaq(el) {
+    el.classList.toggle('open');
+  }
+
+  // Back to top
+  const backTop = document.getElementById('backTop');
+  window.addEventListener('scroll', function() {
+    backTop.classList.toggle('show', window.scrollY > 400);
+  });
+
+  // Scrollspy
+  const navItems = document.querySelectorAll('.nav-item');
+  const sections = document.querySelectorAll('.section');
+
+  window.addEventListener('scroll', function() {
+    let current = '';
+    sections.forEach(function(section) {
+      if (window.scrollY >= section.offsetTop - 120) {
+        current = section.getAttribute('id');
+      }
+    });
+    navItems.forEach(function(item) {
+      item.classList.remove('active');
+      if (item.getAttribute('href') === '#' + current) {
+        item.classList.add('active');
+      }
+    });
+  });
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        window.scrollTo({ top: target.offsetTop - 32, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
