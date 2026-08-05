@@ -161,6 +161,7 @@
             color: var(--text-muted); cursor: pointer; user-select: none; white-space: nowrap;
         }
         .checkbox-label input[type="checkbox"] { margin-right: 6px; width: 15px; height: 15px; accent-color: var(--brand-color); cursor: pointer; }
+        .calc-checkboxes { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
 
         /* BUTTONS */
         .btn {
@@ -491,13 +492,19 @@
             <h4>Combinación Inicial</h4>
             <div id="rowsInicial"></div>
             <button class="btn btn-add" onclick="addRow('Inicial')">+ Agregar código</button>
-            <label class="checkbox-label"><input type="checkbox" id="opInicial"> Modificador OP (30%)</label>
+            <div class="calc-checkboxes">
+              <label class="checkbox-label"><input type="checkbox" id="opInicial"> Modificador OP (30%)</label>
+              <label class="checkbox-label"><input type="checkbox" id="evInicial"> Nivel EV (Valor fijo)</label>
+            </div>
           </div>
           <div class="calc-col">
             <h4>Combinación Propuesta</h4>
             <div id="rowsPropuesto"></div>
             <button class="btn btn-add" onclick="addRow('Propuesto')">+ Agregar código</button>
-            <label class="checkbox-label"><input type="checkbox" id="opPropuesto"> Modificador OP (30%)</label>
+            <div class="calc-checkboxes">
+              <label class="checkbox-label"><input type="checkbox" id="opPropuesto"> Modificador OP (30%)</label>
+              <label class="checkbox-label"><input type="checkbox" id="evPropuesto"> Nivel EV (Valor fijo)</label>
+            </div>
           </div>
         </div>
 
@@ -538,7 +545,7 @@
       let allRows = [];
       let tarifas = {};
       let historial = [];
-      const codigos = ["","EV","EP","EO","EN","EM","EL","EK","EJ","EI","EH","EG","EF","EE","ED","EC","EB","EA","MI","MF","ME","MD","MB","OP","UF","UO","UN","US","UD"];
+      const codigos = ["","EP","EO","EN","EM","EL","EK","EJ","EI","EH","EG","EF","EE","ED","EC","EB","EA","MI","MF","ME","MD","MB","UF","UO","UN","US","UD"];
 
       /* ── TABS ── */
       function showTab(tab) {
@@ -753,7 +760,7 @@
         return Number(val || 0).toLocaleString('es-AR', { maximumFractionDigits: 0 });
       }
 
-      function computeTotal(codes, facs, includeOp, mults) {
+      function computeTotal(codes, facs, includeOp, mults, includeEv) {
         let subtotal = 0;
         codes.forEach(function(code, i) {
           if (code && tarifas[code] != null) {
@@ -763,7 +770,15 @@
           }
         });
         const opValue = includeOp ? subtotal * 0.3 : 0;
-        return { sum: subtotal + opValue, op: opValue };
+        const evValue = (includeEv && tarifas['EV'] != null) ? tarifas['EV'] : 0;
+        return { sum: subtotal + opValue + evValue, op: opValue, ev: evValue };
+      }
+
+      function formatAddons(res) {
+        const parts = [];
+        if (res.op > 0) parts.push('Inc. OP: $ ' + formatNumber(res.op));
+        if (res.ev > 0) parts.push('Inc. EV: $ ' + formatNumber(res.ev));
+        return parts.join(' | ');
       }
 
       function limpiarCalculadora() {
@@ -771,6 +786,7 @@
           document.getElementById('rows' + sec).innerHTML = '';
           for (let i = 0; i < 4; i++) addRow(sec);
           document.getElementById('op' + sec).checked = false;
+          document.getElementById('ev' + sec).checked = false;
         });
         document.getElementById('resultBox').classList.add('hidden');
       }
@@ -784,15 +800,18 @@
           const ini = read('Inicial'), prop = read('Propuesto');
           const opIni = document.getElementById('opInicial').checked;
           const opProp = document.getElementById('opPropuesto').checked;
-          const inicial = computeTotal(ini.codes, ini.facs, opIni, ini.mults);
-          const propuesto = computeTotal(prop.codes, prop.facs, opProp, prop.mults);
+          const evIni = document.getElementById('evInicial').checked;
+          const evProp = document.getElementById('evPropuesto').checked;
+
+          const inicial = computeTotal(ini.codes, ini.facs, opIni, ini.mults, evIni);
+          const propuesto = computeTotal(prop.codes, prop.facs, opProp, prop.mults, evProp);
           const diferencia = inicial.sum - propuesto.sum;
           const esPositivo = propuesto.sum <= inicial.sum;
 
           document.getElementById('resInicialAmt').textContent = '$ ' + formatNumber(inicial.sum);
-          document.getElementById('resInicialOp').textContent = inicial.op > 0 ? 'Inc. OP: $ ' + formatNumber(inicial.op) : '';
+          document.getElementById('resInicialOp').textContent = formatAddons(inicial);
           document.getElementById('resPropuestoAmt').textContent = '$ ' + formatNumber(propuesto.sum);
-          document.getElementById('resPropuestoOp').textContent = propuesto.op > 0 ? 'Inc. OP: $ ' + formatNumber(propuesto.op) : '';
+          document.getElementById('resPropuestoOp').textContent = formatAddons(propuesto);
 
           const difEl = document.getElementById('resDifAmt');
           difEl.textContent = '$ ' + formatNumber(Math.abs(diferencia));
@@ -847,9 +866,9 @@
       function verHistorial(i) {
         const h = historial[i];
         document.getElementById('resInicialAmt').textContent = '$ ' + formatNumber(h.inicial.sum);
-        document.getElementById('resInicialOp').textContent = h.inicial.op > 0 ? 'Inc. OP: $ ' + formatNumber(h.inicial.op) : '';
+        document.getElementById('resInicialOp').textContent = formatAddons(h.inicial);
         document.getElementById('resPropuestoAmt').textContent = '$ ' + formatNumber(h.propuesto.sum);
-        document.getElementById('resPropuestoOp').textContent = h.propuesto.op > 0 ? 'Inc. OP: $ ' + formatNumber(h.propuesto.op) : '';
+        document.getElementById('resPropuestoOp').textContent = formatAddons(h.propuesto);
         const difEl = document.getElementById('resDifAmt');
         difEl.textContent = '$ ' + formatNumber(Math.abs(h.diferencia));
         difEl.className = 'result-diferencia-amount ' + (h.esPositivo ? 'positive' : 'negative');
