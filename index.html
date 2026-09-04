@@ -298,11 +298,16 @@
         .modal-footer {
             border-top: 1px solid var(--border-color); padding: 14px 22px;
             display: flex; align-items: center; justify-content: space-between;
-            font-size: 14px; flex-shrink: 0; background: #f8f9fa; border-radius: 0 0 16px 16px;
+            font-size: 14px; flex-shrink: 0; background: #f8f9fa;
         }
         .modal-footer-label { color: var(--text-muted); font-weight: 500; }
         .modal-footer-value { font-size: 18px; font-weight: 700; color: var(--text-main); }
-        .modal-footer-hint { font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px 22px 14px; }
+        .modal-footer-hint { font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px 22px 6px; }
+        .modal-fecha-actualizacion {
+            font-size: 12px; color: var(--text-muted); text-align: center;
+            padding: 8px 22px 14px; background: #f8f9fa; border-top: 1px solid var(--border-color);
+            border-radius: 0 0 16px 16px; font-weight: 500; flex-shrink: 0;
+        }
 
         .arancel-check { width: 16px; height: 16px; accent-color: var(--brand-color); cursor: pointer; }
 
@@ -483,6 +488,7 @@
               <span class="modal-footer-value" id="comparadorDif">-</span>
             </div>
             <div class="modal-footer-hint" id="comparadorHint">Seleccioná 2 niveles para ver la diferencia</div>
+            <div class="modal-fecha-actualizacion" id="modalFechaActualizacion">Última actualización: 01/08/2026</div>
           </div>
         </div>
 
@@ -626,6 +632,12 @@
           const res = await fetch('tarifas.json');
           if (!res.ok) throw new Error('No se pudo cargar tarifas.json (' + res.status + ')');
           tarifas = await res.json();
+          if (tarifas._fecha_actualizacion) {
+            const fechaEl = document.getElementById('modalFechaActualizacion');
+            if (fechaEl) {
+              fechaEl.textContent = 'Última actualización: ' + tarifas._fecha_actualizacion;
+            }
+          }
         } catch (err) {
           console.error(err);
           alert('Error al cargar tarifas: ' + err.message);
